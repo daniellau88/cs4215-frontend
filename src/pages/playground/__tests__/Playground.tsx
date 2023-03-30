@@ -1,5 +1,5 @@
+import { Chapter, Variant } from 'c-slang/dist/types';
 import { shallow } from 'enzyme';
-import { Chapter, Variant } from 'calc-slang/dist/types';
 import { Provider } from 'react-redux';
 import { mockInitialStore } from 'src/commons/mocks/StoreMocks';
 

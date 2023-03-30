@@ -1,4 +1,4 @@
-import { stringify } from 'calc-slang/dist/utils/stringify';
+import { stringify } from 'c-slang/dist/utils/stringify';
 
 type DisplayBufferCallback = (log: string) => void;
 

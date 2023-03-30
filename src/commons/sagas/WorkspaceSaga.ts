@@ -1,12 +1,11 @@
 import {
   Context,
-  findDeclaration,
   interrupt,
   runInContext
-} from 'calc-slang';
-import { InterruptedError } from 'calc-slang/dist/errors/errors';
-import { parse } from 'calc-slang/dist/parser/parser';
-import { Chapter, Variant } from 'calc-slang/dist/types';
+} from 'c-slang';
+import { InterruptedError } from 'c-slang/dist/errors/errors';
+import { parse } from 'c-slang/dist/parser/parser';
+import { Chapter, Variant } from 'c-slang/dist/types';
 import { random } from 'lodash';
 import Phaser from 'phaser';
 import { SagaIterator } from 'redux-saga';
@@ -271,19 +270,19 @@ export default function* WorkspaceSaga(): SagaIterator {
         (state: OverallState) => state.workspaces[workspaceLocation].editorTabs[0].value
       );
       context = yield select((state: OverallState) => state.workspaces[workspaceLocation].context);
-
-      const result = findDeclaration(code, context, {
-        line: action.payload.cursorPosition.row + 1,
-        column: action.payload.cursorPosition.column
-      });
-      if (result) {
-        yield put(
-          actions.moveCursor(action.payload.workspaceLocation, {
-            row: result.start.line - 1,
-            column: result.start.column
-          })
-        );
-      }
+      console.log(code)
+      // const result = findDeclaration(code, context, {
+      //   line: action.payload.cursorPosition.row + 1,
+      //   column: action.payload.cursorPosition.column
+      // });
+      // if (result) {
+      //   yield put(
+      //     actions.moveCursor(action.payload.workspaceLocation, {
+      //       row: result.start.line - 1,
+      //       column: result.start.column
+      //     })
+      //   );
+      // }
     }
   );
 
@@ -605,7 +604,7 @@ export function* evalCode(
     yield put(actions.endDebuggerPause(workspaceLocation));
     yield put(actions.evalInterpreterSuccess('Breakpoint hit!', workspaceLocation));
     return;
-  } 
+  }
   yield* dumpDisplayBuffer(workspaceLocation);
   // Do not write interpreter output to REPL, if executing chunks (e.g. prepend/postpend blocks)
   if (actionType !== EVAL_SILENT) {

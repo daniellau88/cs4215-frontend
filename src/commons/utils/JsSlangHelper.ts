@@ -1,6 +1,6 @@
 /* tslint:disable: ban-types*/
-import createSlangContext from 'calc-slang/dist/createContext';
-import { Context, Value, Variant } from 'calc-slang/dist/types';
+import createSlangContext from 'c-slang/dist/createContext';
+import { Context, Value, Variant } from 'c-slang/dist/types';
 import { stringify } from 'calc-slang/dist/utils/stringify';
 import { difference, keys } from 'lodash';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';

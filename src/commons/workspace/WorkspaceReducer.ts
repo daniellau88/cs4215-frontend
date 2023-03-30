@@ -1,4 +1,4 @@
-import { stringify } from 'calc-slang/dist/utils/stringify';
+import { stringify } from 'c-slang/dist/utils/stringify';
 import { Reducer } from 'redux';
 
 import { SourcecastReducer } from '../../features/sourceRecorder/sourcecast/SourcecastReducer';
@@ -287,6 +287,7 @@ export const WorkspaceReducer: Reducer<WorkspaceManagerState> = (
        * (1) state[workspaceLocation].output === [], i.e. state[workspaceLocation].output[-1] === undefined
        * (2) state[workspaceLocation].output[-1] is not RunningOutput
        * (3) state[workspaceLocation].output[-1] is RunningOutput */
+      console.log("payload", action.payload)
       lastOutput = state[workspaceLocation].output[state[workspaceLocation].output.length - 1];
       if (lastOutput === undefined || lastOutput.type !== 'running') {
         // New block of output.
@@ -434,7 +435,7 @@ export const WorkspaceReducer: Reducer<WorkspaceManagerState> = (
       /**
        * Set the isRunning property of the
        * context to false, to ensure a re-render.
-       * Also in case the async calc-slang interrupt()
+       * Also in case the async c-slang interrupt()
        * function does not finish interrupting before
        * this action is called.
        */
@@ -496,7 +497,7 @@ export const WorkspaceReducer: Reducer<WorkspaceManagerState> = (
 
     /**
      * Resets the workspace to default settings,
-     * including the calc-slang Context. Apply
+     * including the c-slang Context. Apply
      * any specified settings (workspaceOptions)
      */
     case RESET_WORKSPACE:

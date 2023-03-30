@@ -1,6 +1,6 @@
 import { Card, Classes, Elevation, Pre } from '@blueprintjs/core';
-import { parseError } from 'calc-slang';
-import { stringify } from 'calc-slang/dist/utils/stringify';
+import { parseError } from 'c-slang';
+import { stringify } from 'c-slang/dist/utils/stringify';
 import classNames from 'classnames';
 import * as React from 'react';
 
