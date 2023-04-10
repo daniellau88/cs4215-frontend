@@ -2,7 +2,7 @@
 import createSlangContext from 'c-slang/dist/createContext';
 import { BinaryWithType } from 'c-slang/dist/interpreter/typings';
 import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
-import { Context, Variant } from 'c-slang/dist/types';
+import { Context, CustomBuiltIns, Variant } from 'c-slang/dist/types';
 import { difference, keys } from 'lodash';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
 
@@ -46,8 +46,8 @@ export function highlightLine(line: number) {
   }
 }
 
-export const externalBuiltIns = {
-  printfLog
+export const externalBuiltIns: CustomBuiltIns = {
+  printfLog: printfLog,
 };
 
 /**

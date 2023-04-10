@@ -20,6 +20,7 @@ import {
   setEditorSessionId,
   setSharedbConnected
 } from 'src/commons/collabEditing/CollabEditingActions';
+import SideContentEnvVisualizer from 'src/commons/sideContent/SideContentEnvVisualizer';
 import { useResponsive, useTypedSelector } from 'src/commons/utils/Hooks';
 import {
   browseReplHistoryDown,
@@ -455,8 +456,7 @@ const Playground: React.FC<PlaygroundProps> = ({ workspaceLocation = 'playground
 
   const tabs = React.useMemo(() => {
     const tabs: SideContentTab[] = [playgroundIntroductionTab];
-
-
+    tabs.push(envVisualizerTab);
 
     return tabs;
   }, [playgroundIntroductionTab]);
@@ -575,7 +575,6 @@ const Playground: React.FC<PlaygroundProps> = ({ workspaceLocation = 'playground
     handleEditorUpdateBreakpoints: handleEditorUpdateBreakpoints
   };
 
-  console.log("out", props.output)
   const replProps = {
     ..._.pick(props, 'output', 'replValue', 'handleReplEval', 'usingSubst'),
     handleBrowseHistoryDown: () => dispatch(browseReplHistoryDown(workspaceLocation)),
@@ -678,5 +677,11 @@ const mobileOnlyTabIds: readonly SideContentType[] = [
 ];
 const desktopOnlyTabIds: readonly SideContentType[] = [SideContentType.introduction];
 
+const envVisualizerTab: SideContentTab = {
+  label: 'Env Visualizer',
+  iconName: IconNames.GLOBE,
+  body: <SideContentEnvVisualizer />,
+  id: SideContentType.envVisualizer
+};
 
 export default Playground;

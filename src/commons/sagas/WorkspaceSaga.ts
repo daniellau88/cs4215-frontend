@@ -1,6 +1,7 @@
 import {
   Context,
   interrupt,
+  resume,
   runInContext
 } from 'c-slang';
 import { InterruptedError } from 'c-slang/dist/errors/errors';
@@ -126,7 +127,7 @@ export default function* WorkspaceSaga(): SagaIterator {
     context = yield select((state: OverallState) => state.workspaces[workspaceLocation].context);
     yield put(actions.clearReplOutput(workspaceLocation));
     yield put(actions.highlightEditorLine([], workspaceLocation));
-    context.runtime.break = false;
+    context.programState.setRuntimeBreak(false);
     lastDebuggerResult = undefined;
   });
 
@@ -413,7 +414,7 @@ export function* evalEditor(
 
         const index: number = +b;
         context.errors = [];
-        exploded[index] = 'debugger;' + exploded[index];
+        exploded[index] = 'debugger();' + exploded[index];
         value = exploded.join('\n');
         if (isSourceLanguage(context.chapter)) {
           parse(value, context);
@@ -546,13 +547,15 @@ export function* evalCode(
 
   const { result, interrupted, paused } = yield race({
     result:
-      call(runInContext, code, context, {
-            scheduler: 'preemptive',
-            executionMethod: 'interpreter',
-            originalMaxExecTime: execTime,
-            stepLimit: stepLimit,
-            variant: Variant.DEFAULT,
-            useSubst: false
+      actionType === DEBUG_RESUME
+        ? call(resume, lastDebuggerResult)
+        : call(runInContext, code, context, {
+              scheduler: 'preemptive',
+              executionMethod: 'interpreter',
+              originalMaxExecTime: execTime,
+              stepLimit: stepLimit,
+              variant: Variant.DEFAULT,
+              useSubst: false
           }),
 
     /**
