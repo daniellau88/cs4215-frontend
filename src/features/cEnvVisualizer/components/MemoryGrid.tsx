@@ -5,6 +5,7 @@ import { Group, Rect } from 'react-konva';
 import { ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
 import { DeepReadonly } from '../cEnvVisualizerTypes';
+import { RecordDetail, RecordDetailsMap } from '../cEnvVisualizerUtils';
 import { MemoryBoxGrid } from './MemoryBoxGrid';
 import { Visible } from './Visible';
 
@@ -23,7 +24,8 @@ export class MemoryGrid extends Visible {
 
   constructor(
     /** the environment tree nodes */
-    readonly snapshot: Snapshot
+    readonly snapshot: Snapshot,
+    readonly map: DeepReadonly<RecordDetailsMap>
   ) {
     super();
     this._x = 0;
@@ -32,7 +34,7 @@ export class MemoryGrid extends Visible {
     this.memoryBoxes = [];
     this._height = 0;
     this._width = 0;
-    this.update(snapshot);
+    this.update(snapshot, map);
   }
 
   destroy = () => {
@@ -43,15 +45,16 @@ export class MemoryGrid extends Visible {
    * Processes updates to Layout.environmentTree.
    * @param envTreeNodes an array of different arrays of EnvTreeNodes corresponding to a single level.
    */
-  update(snapshot: Snapshot) {
+  update(snapshot: Snapshot, map: DeepReadonly<RecordDetailsMap>) {
     const keys = Object.keys(snapshot);
-    keys.sort();
+    keys.sort((x, y) => parseInt(x) - parseInt(y)); // keys are in string
 
     const newMemoryBoxes: MemoryBoxGrid[] = [];
     let lastY = 0;
     keys.forEach((key, i) => {
       const value = snapshot[key] as BinaryWithOptionalType;
-      const memoryBox = new MemoryBoxGrid(value, i);
+      const details = map[key] as DeepReadonly<Array<RecordDetail>> | undefined;
+      const memoryBox = new MemoryBoxGrid(parseInt(keys[i]), value, details);
       newMemoryBoxes.push(memoryBox);
       const newY = lastY + memoryBox.height();
       memoryBox.setY(newY);

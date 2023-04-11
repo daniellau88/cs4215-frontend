@@ -5,6 +5,8 @@ import { Group, Rect, Text } from 'react-konva';
 
 import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
+import { DeepReadonly } from '../cEnvVisualizerTypes';
+import { RecordDetail } from '../cEnvVisualizerUtils';
 import { Visible } from './Visible';
 
 /**
@@ -16,11 +18,13 @@ export class MemoryBoxGrid extends Visible {
   widths: number[];
   static cumHeights: number[];
   boxText: string;
+  boxDetails: string;
 
   constructor(
     /** the environment tree nodes */
+    readonly address: number,
     readonly binaryType: BinaryWithOptionalType,
-    readonly address: number
+    readonly details?: DeepReadonly<Array<RecordDetail>>
   ) {
     super();
     this._x = 0;
@@ -30,9 +34,10 @@ export class MemoryBoxGrid extends Visible {
     // this.levels = [];
     this.widths = [];
     this._height = 30;
-    this._width = 130;
+    this._width = 180;
     this.boxText = '';
-    this.update(binaryType);
+    this.boxDetails = '';
+    this.update(address, binaryType, details);
   }
 
   setY(y: number) {
@@ -47,8 +52,23 @@ export class MemoryBoxGrid extends Visible {
    * Processes updates to Layout.environmentTree.
    * @param envTreeNodes an array of different arrays of EnvTreeNodes corresponding to a single level.
    */
-  update(binaryType: BinaryWithOptionalType) {
+  update(
+    address: number,
+    binaryType: BinaryWithOptionalType,
+    details?: DeepReadonly<Array<RecordDetail>>
+  ) {
     this.boxText = binaryToFormattedString(binaryType.binary, binaryType.type);
+
+    if (details !== undefined && details.length > 0) {
+      const topDetail = details[0];
+      if (topDetail.subtype === 'stack_pointer') {
+        this.boxDetails = `${topDetail.funcName} Stack Pointer`;
+      } else {
+        this.boxDetails = `${topDetail.funcName}.${topDetail.varName}`;
+      }
+    } else {
+      this.boxDetails = '';
+    }
   }
 
   draw(): React.ReactNode {
@@ -68,7 +88,7 @@ export class MemoryBoxGrid extends Visible {
           {...ShapeDefaultProps}
           x={this.x() + 30}
           y={this.y()}
-          width={this.width()}
+          width={this.width() - 30 - 50}
           height={this.height()}
           key={Layout.key++}
           listening={false}
@@ -78,9 +98,19 @@ export class MemoryBoxGrid extends Visible {
           text={this.boxText || 'empty'}
           x={this.x() + 30}
           y={this.y()}
-          width={this.width()}
+          width={this.width() - 30 - 50}
           height={this.height()}
           align="center"
+          verticalAlign="middle"
+          fill={Config.SA_WHITE.toString()}
+        />
+        <Text
+          text={this.boxDetails}
+          x={this.x() + 130 + 10}
+          y={this.y()}
+          width={this.width() - 30 - 50}
+          height={this.height()}
+          align="left"
           verticalAlign="middle"
           fill={Config.SA_WHITE.toString()}
         />

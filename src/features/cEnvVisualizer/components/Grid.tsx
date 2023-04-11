@@ -4,6 +4,11 @@ import { Group, Rect } from 'react-konva';
 
 import { ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
+import {
+  createRecordDetailMap,
+  populateRecordDetailMapWithEnv,
+  populateRecordDetailMapWithStackPointer
+} from '../cEnvVisualizerUtils';
 import { MemoryGrid } from './MemoryGrid';
 import { Visible } from './Visible';
 
@@ -47,17 +52,22 @@ export class Grid extends Visible {
   update(state: ProgramState) {
     const rtsSnapshot = state.getRTSSnapshot();
     const heapSnapshot = state.getHeapSnapshot();
+    const env = state.getE();
+    const rtsStart = state.getRTSStart();
+    const map = createRecordDetailMap();
+    populateRecordDetailMapWithEnv(map, env);
+    populateRecordDetailMapWithStackPointer(map, rtsStart, rtsSnapshot, env);
 
     if (!this.rtsMemoryGrid) {
-      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot);
+      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map);
     } else {
-      this.rtsMemoryGrid.update(rtsSnapshot);
+      this.rtsMemoryGrid.update(rtsSnapshot, map);
     }
 
     if (!this.heapMemoryGrid) {
-      this.heapMemoryGrid = new MemoryGrid(heapSnapshot);
+      this.heapMemoryGrid = new MemoryGrid(heapSnapshot, map);
     } else {
-      this.heapMemoryGrid.update(heapSnapshot);
+      this.heapMemoryGrid.update(heapSnapshot, map);
     }
   }
 
