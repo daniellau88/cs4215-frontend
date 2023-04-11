@@ -267,6 +267,7 @@ export default function* WorkspaceSaga(): SagaIterator {
         // TODO: Hardcoded to make use of the first editor tab. Rewrite after editor tabs are added.
         (state: OverallState) => state.workspaces[workspaceLocation].editorTabs[0].value
       );
+      console.log(code);
       context = yield select((state: OverallState) => state.workspaces[workspaceLocation].context);
       // const result = findDeclaration(code, context, {
       //   line: action.payload.cursorPosition.row + 1,
