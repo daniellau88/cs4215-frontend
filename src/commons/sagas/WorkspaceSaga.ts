@@ -1,12 +1,8 @@
-import {
-  Context,
-  interrupt,
-  resume,
-  runInContext
-} from 'c-slang';
+import { Context, interrupt, resume, runInContext } from 'c-slang';
 import { InterruptedError } from 'c-slang/dist/errors/errors';
+import { isMicrocode } from 'c-slang/dist/interpreter/utils/utils';
 import { parse } from 'c-slang/dist/parser/parser';
-import { Chapter, Variant } from 'c-slang/dist/types';
+import { Chapter, Result, Variant } from 'c-slang/dist/types';
 import { random } from 'lodash';
 import Phaser from 'phaser';
 import { SagaIterator } from 'redux-saga';
@@ -40,6 +36,7 @@ import {
   highlightClean,
   highlightLine,
   makeElevatedContext,
+  visualizeCEnv,
   visualizeEnv
 } from '../utils/JsSlangHelper';
 import { showSuccessMessage, showWarningMessage } from '../utils/NotificationsHelper';
@@ -271,7 +268,6 @@ export default function* WorkspaceSaga(): SagaIterator {
         (state: OverallState) => state.workspaces[workspaceLocation].editorTabs[0].value
       );
       context = yield select((state: OverallState) => state.workspaces[workspaceLocation].context);
-      console.log(code)
       // const result = findDeclaration(code, context, {
       //   line: action.payload.cursorPosition.row + 1,
       //   column: action.payload.cursorPosition.column
@@ -317,12 +313,18 @@ export default function* WorkspaceSaga(): SagaIterator {
   );
 }
 
-let lastDebuggerResult: any;
+let lastDebuggerResult: Result | undefined;
 function* updateInspector(workspaceLocation: WorkspaceLocation): SagaIterator {
   try {
-    const start = lastDebuggerResult.context.runtime.nodes[0].loc.start.line - 1;
-    const end = lastDebuggerResult.context.runtime.nodes[0].loc.end.line - 1;
+    if (lastDebuggerResult === undefined || lastDebuggerResult.status === 'error') return;
+    const nextInstruction = lastDebuggerResult.context.programState.peekA();
+    if (nextInstruction === undefined) return;
+    const node = isMicrocode(nextInstruction) ? nextInstruction.node : nextInstruction;
+    const start = node.loc.start.line - 1;
+    const end = node.loc.end.line - 1;
+
     yield put(actions.highlightEditorLine([start, end], workspaceLocation));
+    visualizeCEnv(lastDebuggerResult);
     visualizeEnv(lastDebuggerResult);
   } catch (e) {
     yield put(actions.highlightEditorLine([], workspaceLocation));
@@ -547,15 +549,15 @@ export function* evalCode(
 
   const { result, interrupted, paused } = yield race({
     result:
-      actionType === DEBUG_RESUME
+      actionType === DEBUG_RESUME && lastDebuggerResult
         ? call(resume, lastDebuggerResult)
         : call(runInContext, code, context, {
-              scheduler: 'preemptive',
-              executionMethod: 'interpreter',
-              originalMaxExecTime: execTime,
-              stepLimit: stepLimit,
-              variant: Variant.DEFAULT,
-              useSubst: false
+            scheduler: 'preemptive',
+            executionMethod: 'interpreter',
+            originalMaxExecTime: execTime,
+            stepLimit: stepLimit,
+            variant: Variant.DEFAULT,
+            useSubst: false
           }),
 
     /**

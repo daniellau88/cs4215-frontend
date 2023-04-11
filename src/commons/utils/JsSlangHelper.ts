@@ -4,6 +4,7 @@ import { BinaryWithType } from 'c-slang/dist/interpreter/typings';
 import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
 import { Context, CustomBuiltIns, Variant } from 'c-slang/dist/types';
 import { difference, keys } from 'lodash';
+import CEnvVisualizer from 'src/features/cEnvVisualizer/cEnvVisualizer';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
 
 import DisplayBufferService from './DisplayBufferService';
@@ -17,9 +18,17 @@ import DisplayBufferService from './DisplayBufferService';
 
 function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {
   args.forEach(x => {
-    const output = binaryToFormattedString(x.binary, x.type)
-    DisplayBufferService.push(output, workspaceLocation)
-  })
+    const output = binaryToFormattedString(x.binary, x.type);
+    DisplayBufferService.push(output, workspaceLocation);
+  });
+}
+
+export function visualizeCEnv({ context }: { context: Context }) {
+  try {
+    CEnvVisualizer.drawEnv(context);
+  } catch (err) {
+    throw new Error('C Env visualizer is not enabled');
+  }
 }
 
 export function visualizeEnv({ context }: { context: Context }) {
@@ -47,7 +56,7 @@ export function highlightLine(line: number) {
 }
 
 export const externalBuiltIns: CustomBuiltIns = {
-  printfLog: printfLog,
+  printfLog: printfLog
 };
 
 /**
