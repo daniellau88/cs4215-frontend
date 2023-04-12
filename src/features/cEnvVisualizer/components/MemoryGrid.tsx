@@ -8,7 +8,8 @@ import {
   DeepReadonly,
   RecordDetail,
   RecordDetailsMap,
-  SnapshotOptions
+  SnapshotOptions,
+  TooltipDetails
 } from '../cEnvVisualizerTypes';
 import { MemoryBoxGrid } from './MemoryBoxGrid';
 import { MemoryBoxSkipGrid } from './MemoryBoxSkipGrid';
@@ -32,6 +33,7 @@ export class MemoryGrid extends Visible {
     readonly snapshot: Snapshot,
     readonly map: RecordDetailsMap,
     readonly snapshotOptions: DeepReadonly<SnapshotOptions>,
+    readonly setTooltipDetails: (details?: TooltipDetails) => void,
     reverse: boolean = false
   ) {
     super();
@@ -84,7 +86,7 @@ export class MemoryGrid extends Visible {
       }
       const value = snapshot[key] as BinaryWithOptionalType;
       const details = map.memory[key] as DeepReadonly<Array<RecordDetail>> | undefined;
-      const memoryBox = new MemoryBoxGrid(keyInt, value, this.snapshotOptions, map, details);
+      const memoryBox = new MemoryBoxGrid(keyInt, value, this.snapshotOptions, map, this.setTooltipDetails, details);
       newMemoryBoxes.push(memoryBox);
       const newY = lastY + memoryBox.height() + 1;
       memoryBox.setY(newY);

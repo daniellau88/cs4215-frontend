@@ -45,3 +45,9 @@ export interface RecordDetailsMap {
   memory: Record<number, Array<RecordDetail>>;
   func: Record<number, RecordDetail>;
 }
+
+export interface TooltipDetails {
+  tooltipMessage: string;
+  x: number;
+  y: number;
+}

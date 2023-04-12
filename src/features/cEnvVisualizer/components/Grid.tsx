@@ -1,10 +1,10 @@
 import { ProgramState } from 'c-slang/dist/interpreter/programState';
 import React from 'react';
-import { Group, Rect } from 'react-konva';
+import { Group, Label as KonvaLabel, Rect, Tag as KonvaTag, Text as KonvaText } from 'react-konva';
 
-import { ShapeDefaultProps } from '../cEnvVisualizerConfig';
+import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
-import { DeepReadonly, SnapshotOptions } from '../cEnvVisualizerTypes';
+import { DeepReadonly, SnapshotOptions, TooltipDetails } from '../cEnvVisualizerTypes';
 import {
   createRecordDetailMap,
   populateRecordDetailMapWithEnv,
@@ -24,6 +24,9 @@ export class Grid extends Visible {
 
   rtsMemoryGrid?: MemoryGrid;
   heapMemoryGrid?: MemoryGrid;
+  tooltipDetail?: TooltipDetails;
+  readonly labelRef: React.RefObject<any> = React.createRef();
+  readonly labelTextRef: React.RefObject<any> = React.createRef();
 
   constructor(
     /** the environment tree nodes */
@@ -66,14 +69,25 @@ export class Grid extends Visible {
     populateRecordDetailMapWithEnv(map, env);
     populateRecordDetailMapWithStackPointer(map, rtsStart, rtsSnapshot, env);
 
+    const setTooltipDetail = (detail?: TooltipDetails) => {
+      this.tooltipDetail = detail;
+      if (detail !== undefined) {
+        this.labelTextRef.current.text(detail.tooltipMessage);
+        this.labelRef.current.position({ x: detail.x, y: detail.y });
+        this.labelRef.current.moveToTop();
+        this.labelRef.current.show();
+      } else {
+        this.labelRef.current.hide();
+      }
+    }
     if (!this.rtsMemoryGrid) {
-      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map, snapshotOptions);
+      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map, snapshotOptions, setTooltipDetail);
     } else {
       this.rtsMemoryGrid.update(rtsSnapshot, map);
     }
 
     if (!this.heapMemoryGrid) {
-      this.heapMemoryGrid = new MemoryGrid(heapSnapshot, map, snapshotOptions, true);
+      this.heapMemoryGrid = new MemoryGrid(heapSnapshot, map, snapshotOptions, setTooltipDetail, true);
     } else {
       this.heapMemoryGrid.update(heapSnapshot, map, true);
     }
@@ -109,6 +123,23 @@ export class Grid extends Visible {
         />
         {this.rtsMemoryGrid?.draw()}
         {this.heapMemoryGrid?.draw()}
+
+        <KonvaLabel
+          visible={false}
+          ref={this.labelRef}
+        >
+          <KonvaTag stroke="black" fill={'black'} opacity={Number(Config.FnTooltipOpacity)} />
+          <KonvaText
+            fontFamily={Config.FontFamily.toString()}
+            fontSize={Number(Config.FontSize)}
+            fontStyle={Config.FontStyle.toString()}
+            fill={Config.SA_WHITE.toString()}
+            wrap="char"
+            padding={5}
+            width={300}
+            ref={this.labelTextRef}
+          />
+        </KonvaLabel>
       </Group>
     );
   }

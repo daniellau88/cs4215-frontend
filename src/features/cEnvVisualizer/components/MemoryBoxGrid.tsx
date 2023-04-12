@@ -1,7 +1,7 @@
 import { BinaryWithOptionalType } from 'c-slang/dist/interpreter/typings';
 import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
 import React from 'react';
-import { Group, Label as KonvaLabel, Rect, Tag as KonvaTag, Text as KonvaText } from 'react-konva';
+import { Group, Rect, Text as KonvaText } from 'react-konva';
 
 import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
@@ -9,7 +9,8 @@ import {
   DeepReadonly,
   RecordDetail,
   RecordDetailsMap,
-  SnapshotOptions
+  SnapshotOptions,
+  TooltipDetails
 } from '../cEnvVisualizerTypes';
 import {
   getTooltipMessageForReference,
@@ -29,7 +30,6 @@ export class MemoryBoxGrid extends Visible {
   static cumHeights: number[];
   readonly boxText: string;
   readonly boxDetails: string;
-  readonly labelRef: React.RefObject<any> = React.createRef();
   readonly tooltip: string;
 
   constructor(
@@ -38,6 +38,7 @@ export class MemoryBoxGrid extends Visible {
     readonly binaryType: BinaryWithOptionalType,
     readonly snapshotOptions: DeepReadonly<SnapshotOptions>,
     readonly map: RecordDetailsMap,
+    readonly setTooltipDetails: (details?: TooltipDetails) => void,
     readonly details?: DeepReadonly<Array<RecordDetail>>
   ) {
     super();
@@ -62,7 +63,7 @@ export class MemoryBoxGrid extends Visible {
       this.boxDetails = '';
     }
 
-    const valueToolTip = `Actual memory value:\n${getToolTipMessageForValue(
+    const valueToolTip = `Memory value:\n${getToolTipMessageForValue(
       binaryType,
       snapshotOptions,
       map
@@ -87,17 +88,16 @@ export class MemoryBoxGrid extends Visible {
   }
 
   onMouseEnter = () => {
-    if (this.tooltip) {
-      this.labelRef.current.moveToTop();
-      this.labelRef.current.show();
-    }
+    this.setTooltipDetails({
+      tooltipMessage: this.tooltip,
+      x: this.x() + this.width() + Config.TextPaddingX * 2,
+      y: this.y() - Config.TextPaddingY,
+    });
     setHoveredStyle(this.ref.current);
   };
 
   onMouseLeave = () => {
-    if (this.tooltip) {
-      this.labelRef.current.hide();
-    }
+    this.setTooltipDetails(undefined);
     setUnhoveredStyle(this.ref.current);
   };
 
@@ -142,30 +142,9 @@ export class MemoryBoxGrid extends Visible {
           height={this.height()}
           key={Layout.key++}
           stroke={Config.SA_WHITE.toString()}
-          onClick={e => {
-            console.log('hiiii');
-          }}
           onMouseEnter={() => this.onMouseEnter()}
           onMouseLeave={() => this.onMouseLeave()}
         />
-        <KonvaLabel
-          x={this.x() + this.width() + Config.TextPaddingX * 2}
-          y={this.y() - Config.TextPaddingY}
-          visible={false}
-          ref={this.labelRef}
-        >
-          <KonvaTag stroke="black" fill={'black'} opacity={Number(Config.FnTooltipOpacity)} />
-          <KonvaText
-            text={this.tooltip}
-            fontFamily={Config.FontFamily.toString()}
-            fontSize={Number(Config.FontSize)}
-            fontStyle={Config.FontStyle.toString()}
-            fill={Config.SA_WHITE.toString()}
-            wrap="char"
-            padding={5}
-            width={300}
-          />
-        </KonvaLabel>
       </Group>
     );
   }
