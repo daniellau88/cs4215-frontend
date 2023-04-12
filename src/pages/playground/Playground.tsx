@@ -20,7 +20,7 @@ import {
   setEditorSessionId,
   setSharedbConnected
 } from 'src/commons/collabEditing/CollabEditingActions';
-import SideContentCEnvVisualizer from 'src/commons/sideContent/SideContentCEnvVisualizer';
+import SideContentCMemoryVisualizer from 'src/commons/sideContent/SideContentCMemoryVisualizer';
 import SideContentEnvVisualizer from 'src/commons/sideContent/SideContentEnvVisualizer';
 import { useResponsive, useTypedSelector } from 'src/commons/utils/Hooks';
 import {
@@ -458,7 +458,7 @@ const Playground: React.FC<PlaygroundProps> = ({ workspaceLocation = 'playground
   const tabs = React.useMemo(() => {
     const tabs: SideContentTab[] = [playgroundIntroductionTab];
     tabs.push(envVisualizerTab);
-    tabs.push(cEnvVisualizerTab);
+    tabs.push(cMemoryVisualizerTab);
     return tabs;
   }, [playgroundIntroductionTab]);
 
@@ -685,11 +685,11 @@ const envVisualizerTab: SideContentTab = {
   id: SideContentType.envVisualizer
 };
 
-const cEnvVisualizerTab: SideContentTab = {
-  label: 'C Env Visualizer',
+const cMemoryVisualizerTab: SideContentTab = {
+  label: 'C Memory Visualizer',
   iconName: IconNames.CODE,
-  body: <SideContentCEnvVisualizer />,
-  id: SideContentType.cEnvVisualizer
+  body: <SideContentCMemoryVisualizer />,
+  id: SideContentType.cMemoryVisualizer
 };
 
 export default Playground;

@@ -3,21 +3,21 @@ import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
 import React from 'react';
 import { Group, Rect, Text as KonvaText } from 'react-konva';
 
-import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
-import { Layout } from '../cEnvVisualizerLayout';
+import { Config, ShapeDefaultProps } from '../cMemoryVisualizerConfig';
+import { Layout } from '../cMemoryVisualizerLayout';
 import {
   DeepReadonly,
   RecordDetail,
   RecordDetailsMap,
   SnapshotOptions,
   TooltipDetails
-} from '../cEnvVisualizerTypes';
+} from '../cMemoryVisualizerTypes';
 import {
   getTooltipMessageForReference,
   getToolTipMessageForValue,
   setHoveredStyle,
   setUnhoveredStyle
-} from '../cEnvVisualizerUtils';
+} from '../cMemoryVisualizerUtils';
 import { Visible } from './Visible';
 
 /**

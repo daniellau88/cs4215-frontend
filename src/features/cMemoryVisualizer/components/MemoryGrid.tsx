@@ -2,15 +2,15 @@ import { BinaryWithOptionalType } from 'c-slang/dist/interpreter/typings';
 import React from 'react';
 import { Group, Rect } from 'react-konva';
 
-import { ShapeDefaultProps } from '../cEnvVisualizerConfig';
-import { Layout } from '../cEnvVisualizerLayout';
+import { ShapeDefaultProps } from '../cMemoryVisualizerConfig';
+import { Layout } from '../cMemoryVisualizerLayout';
 import {
   DeepReadonly,
   RecordDetail,
   RecordDetailsMap,
   SnapshotOptions,
   TooltipDetails
-} from '../cEnvVisualizerTypes';
+} from '../cMemoryVisualizerTypes';
 import { MemoryBoxGrid } from './MemoryBoxGrid';
 import { MemoryBoxSkipGrid } from './MemoryBoxSkipGrid';
 import { Visible } from './Visible';

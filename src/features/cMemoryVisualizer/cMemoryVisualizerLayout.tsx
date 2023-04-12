@@ -2,8 +2,8 @@ import { ProgramState } from 'c-slang/dist/interpreter/programState';
 import React, { RefObject } from 'react';
 import { Layer, Rect, Stage } from 'react-konva';
 
-import CEnvVisualizer from './cEnvVisualizer';
-import { Config, ShapeDefaultProps } from './cEnvVisualizerConfig';
+import CMemoryVisualizer from './cMemoryVisualizer';
+import { Config, ShapeDefaultProps } from './cMemoryVisualizerConfig';
 import { Grid } from './components/Grid';
 
 /** this class encapsulates the logic for calculating the layout */
@@ -61,7 +61,7 @@ export class Layout {
       Layout.stageHeight = Math.min(Layout.height(), window.innerHeight);
       Layout.stageRef.current.width(Layout.stageWidth);
       Layout.stageRef.current.height(Layout.stageHeight);
-      CEnvVisualizer.redraw();
+      CMemoryVisualizer.redraw();
     }
     if (Layout.stageHeight > Layout.visibleHeight) {
     }
@@ -92,11 +92,11 @@ export class Layout {
   }
 
   public static width(): number {
-    return CEnvVisualizer.getCompactLayout() ? Layout.compactWidth : Layout.nonCompactWidth;
+    return CMemoryVisualizer.getCompactLayout() ? Layout.compactWidth : Layout.nonCompactWidth;
   }
 
   public static height(): number {
-    return CEnvVisualizer.getCompactLayout() ? Layout.compactHeight : Layout.nonCompactHeight;
+    return CMemoryVisualizer.getCompactLayout() ? Layout.compactHeight : Layout.nonCompactHeight;
   }
 
   /** initializes grid */
@@ -141,7 +141,7 @@ export class Layout {
                 width: Layout.width(),
                 height: Layout.height(),
                 overflow: 'hidden',
-                backgroundColor: CEnvVisualizer.getPrintableMode()
+                backgroundColor: CMemoryVisualizer.getPrintableMode()
                   ? Config.PRINT_BACKGROUND.toString()
                   : Config.SA_BLUE.toString()
               }}
@@ -155,7 +155,7 @@ export class Layout {
                     width={Layout.width()}
                     height={Layout.height()}
                     fill={
-                      CEnvVisualizer.getPrintableMode()
+                      CMemoryVisualizer.getPrintableMode()
                         ? Config.PRINT_BACKGROUND.toString()
                         : Config.SA_BLUE.toString()
                     }
@@ -170,14 +170,14 @@ export class Layout {
         </div>
       );
       Layout.prevLayout = layout;
-      if (CEnvVisualizer.getCompactLayout()) {
-        if (CEnvVisualizer.getPrintableMode()) {
+      if (CMemoryVisualizer.getCompactLayout()) {
+        if (CMemoryVisualizer.getPrintableMode()) {
           Layout.currentCompactLight = layout;
         } else {
           Layout.currentCompactDark = layout;
         }
       } else {
-        if (CEnvVisualizer.getPrintableMode()) {
+        if (CMemoryVisualizer.getPrintableMode()) {
           Layout.currentLight = layout;
         } else {
           Layout.currentDark = layout;

@@ -4,7 +4,7 @@ import { BinaryWithType } from 'c-slang/dist/interpreter/typings';
 import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
 import { Context, CustomBuiltIns, Variant } from 'c-slang/dist/types';
 import { difference, keys } from 'lodash';
-import CEnvVisualizer from 'src/features/cEnvVisualizer/cEnvVisualizer';
+import CMemoryVisualizer from 'src/features/cMemoryVisualizer/cMemoryVisualizer';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
 
 import DisplayBufferService from './DisplayBufferService';
@@ -25,10 +25,10 @@ function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {
 
 export function visualizeCEnv({ context }: { context: Context }) {
   try {
-    CEnvVisualizer.drawEnv(context);
+    CMemoryVisualizer.drawEnv(context);
   } catch (err) {
     console.error(err);
-    throw new Error('C Env visualizer is not enabled');
+    throw new Error('C memory visualizer is not enabled');
   }
 }
 

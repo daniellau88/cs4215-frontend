@@ -1,9 +1,9 @@
 import React from 'react';
 import { Group, Rect, Text as KonvaText } from 'react-konva';
 
-import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
-import { Layout } from '../cEnvVisualizerLayout';
-import { setHoveredStyle, setUnhoveredStyle } from '../cEnvVisualizerUtils';
+import { Config, ShapeDefaultProps } from '../cMemoryVisualizerConfig';
+import { Layout } from '../cMemoryVisualizerLayout';
+import { setHoveredStyle, setUnhoveredStyle } from '../cMemoryVisualizerUtils';
 import { Visible } from './Visible';
 
 /**

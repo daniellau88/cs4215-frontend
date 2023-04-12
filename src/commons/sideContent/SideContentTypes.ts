@@ -35,7 +35,7 @@ export enum SideContentType {
   testcases = 'testcases',
   toneMatrix = 'tone_matrix',
   htmlDisplay = 'html_display',
-  cEnvVisualizer = 'c_env_visualizer'
+  cMemoryVisualizer = 'c_memory_visualizer'
 }
 
 /**

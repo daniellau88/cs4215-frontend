@@ -2,14 +2,14 @@ import { ProgramState } from 'c-slang/dist/interpreter/programState';
 import React from 'react';
 import { Group, Label as KonvaLabel, Rect, Tag as KonvaTag, Text as KonvaText } from 'react-konva';
 
-import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
-import { Layout } from '../cEnvVisualizerLayout';
-import { DeepReadonly, SnapshotOptions, TooltipDetails } from '../cEnvVisualizerTypes';
+import { Config, ShapeDefaultProps } from '../cMemoryVisualizerConfig';
+import { Layout } from '../cMemoryVisualizerLayout';
+import { DeepReadonly, SnapshotOptions, TooltipDetails } from '../cMemoryVisualizerTypes';
 import {
   createRecordDetailMap,
   populateRecordDetailMapWithEnv,
   populateRecordDetailMapWithStackPointer
-} from '../cEnvVisualizerUtils';
+} from '../cMemoryVisualizerUtils';
 import { MemoryGrid } from './MemoryGrid';
 import { Visible } from './Visible';
 

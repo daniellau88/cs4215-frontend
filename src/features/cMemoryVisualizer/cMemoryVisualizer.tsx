@@ -2,28 +2,28 @@ import { Context } from 'c-slang';
 import { ProgramState } from 'c-slang/dist/interpreter/programState';
 import React from 'react';
 
-import { Layout } from './cEnvVisualizerLayout';
+import { Layout } from './cMemoryVisualizerLayout';
 
 type SetVis = (vis: React.ReactNode) => void;
 
 /** Environment Visualizer is exposed from this class */
-export default class EnvVisualizer {
+export default class CMemoryVisualizer {
   /** callback function to update the visualization state in the SideContentEnvVis component */
   private static setVis: SetVis;
   private static printableMode: boolean = false;
   private static compactLayout: boolean = true;
   private static programState: ProgramState;
   public static togglePrintableMode(): void {
-    EnvVisualizer.printableMode = !EnvVisualizer.printableMode;
+    CMemoryVisualizer.printableMode = !CMemoryVisualizer.printableMode;
   }
   public static toggleCompactLayout(): void {
-    EnvVisualizer.compactLayout = !EnvVisualizer.compactLayout;
+    CMemoryVisualizer.compactLayout = !CMemoryVisualizer.compactLayout;
   }
   public static getPrintableMode(): boolean {
-    return EnvVisualizer.printableMode;
+    return CMemoryVisualizer.printableMode;
   }
   public static getCompactLayout(): boolean {
-    return EnvVisualizer.compactLayout;
+    return CMemoryVisualizer.compactLayout;
   }
 
   /** SideContentEnvVis initializes this onMount with the callback function */
@@ -42,15 +42,15 @@ export default class EnvVisualizer {
    * the JS Slang context passed in */
   static drawEnv(context: Context) {
     // store environmentTree at last breakpoint.
-    EnvVisualizer.programState = context.programState;
-    if (!this.setVis) throw new Error('env visualizer not initialized');
+    CMemoryVisualizer.programState = context.programState;
+    if (!this.setVis) throw new Error('c memory visualizer not initialized');
 
     Layout.setContext(context.programState);
     this.setVis(Layout.draw());
     Layout.updateDimensions(Layout.visibleWidth, Layout.visibleHeight);
 
     // icon to blink
-    const icon = document.getElementById('c_env_visualizer-icon');
+    const icon = document.getElementById('c_memory_visualizer-icon');
     icon && icon.classList.add('side-content-tab-alert');
   }
 
@@ -58,31 +58,31 @@ export default class EnvVisualizer {
     if (this.programState) {
       // checks if the required diagram exists, and updates the dom node using setVis
       if (
-        EnvVisualizer.getCompactLayout() &&
-        EnvVisualizer.getPrintableMode() &&
+        CMemoryVisualizer.getCompactLayout() &&
+        CMemoryVisualizer.getPrintableMode() &&
         Layout.currentCompactLight !== undefined
       ) {
         this.setVis(Layout.currentCompactLight);
       } else if (
-        EnvVisualizer.getCompactLayout() &&
-        !EnvVisualizer.getPrintableMode() &&
+        CMemoryVisualizer.getCompactLayout() &&
+        !CMemoryVisualizer.getPrintableMode() &&
         Layout.currentCompactDark !== undefined
       ) {
         this.setVis(Layout.currentCompactDark);
       } else if (
-        !EnvVisualizer.getCompactLayout() &&
-        EnvVisualizer.getPrintableMode() &&
+        !CMemoryVisualizer.getCompactLayout() &&
+        CMemoryVisualizer.getPrintableMode() &&
         Layout.currentLight !== undefined
       ) {
         this.setVis(Layout.currentLight);
       } else if (
-        !EnvVisualizer.getCompactLayout() &&
-        !EnvVisualizer.getPrintableMode() &&
+        !CMemoryVisualizer.getCompactLayout() &&
+        !CMemoryVisualizer.getPrintableMode() &&
         Layout.currentDark !== undefined
       ) {
         this.setVis(Layout.currentDark);
       } else {
-        Layout.setContext(EnvVisualizer.programState);
+        Layout.setContext(CMemoryVisualizer.programState);
         this.setVis(Layout.draw());
       }
       Layout.updateDimensions(Layout.visibleWidth, Layout.visibleHeight);

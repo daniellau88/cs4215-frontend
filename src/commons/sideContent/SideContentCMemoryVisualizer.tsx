@@ -1,9 +1,9 @@
 import { Classes } from '@blueprintjs/core';
 import { debounce } from 'lodash';
 import * as React from 'react';
-import CEnvVisualizer from 'src/features/cEnvVisualizer/cEnvVisualizer';
+import CMemoryVisualizer from 'src/features/cMemoryVisualizer/cMemoryVisualizer';
 
-import Constants, { Links } from '../utils/Constants';
+import Constants from '../utils/Constants';
 
 type State = {
   visualization: React.ReactNode;
@@ -11,7 +11,7 @@ type State = {
   width: number;
 };
 
-class SideContentEnvVisualizer extends React.Component<
+class SideContentMemoryVisualizer extends React.Component<
   { editorWidth?: string; sideContentHeight?: number },
   State
 > {
@@ -22,7 +22,7 @@ class SideContentEnvVisualizer extends React.Component<
       width: this.calculateWidth(props.editorWidth),
       height: this.calculateHeight(props.sideContentHeight)
     };
-    CEnvVisualizer.init(
+    CMemoryVisualizer.init(
       visualization => {
         return this.setState({ visualization });
       },
@@ -69,14 +69,14 @@ class SideContentEnvVisualizer extends React.Component<
         height: newHeight,
         width: newWidth
       });
-      CEnvVisualizer.updateDimensions(newWidth, newHeight);
+      CMemoryVisualizer.updateDimensions(newWidth, newHeight);
     }
   }, 300);
 
   componentDidMount() {
     this.handleResize();
     window.addEventListener('resize', this.handleResize);
-    CEnvVisualizer.redraw();
+    CMemoryVisualizer.redraw();
   }
   componentWillUnmount() {
     this.handleResize.cancel();
@@ -97,22 +97,7 @@ class SideContentEnvVisualizer extends React.Component<
       <div className={Classes.DARK}>
         {this.state.visualization || (
           <p id="env-visualizer-default-text" className={Classes.RUNNING_TEXT}>
-            The environment model visualizer generates environment model diagrams following a
-            notation introduced in{' '}
-            <a href={Links.textbookChapter3_2} rel="noopener noreferrer" target="_blank">
-              <i>
-                Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 3,
-                Section 2
-              </i>
-            </a>
             .
-            <br />
-            <br />
-            It is activated by setting breakpoints before you run the program. You can set a
-            breakpoint by clicking on the gutter of the editor (where all the line numbers are, on
-            the left). When the program runs into a breakpoint, the visualizer displays the state of
-            the environments before the statement is evaluated, which starts in the line in which
-            you set the breakpoint. Every breakpoint must be at the beginning of a statement.
           </p>
         )}
       </div>
@@ -120,4 +105,4 @@ class SideContentEnvVisualizer extends React.Component<
   }
 }
 
-export default SideContentEnvVisualizer;
+export default SideContentMemoryVisualizer;

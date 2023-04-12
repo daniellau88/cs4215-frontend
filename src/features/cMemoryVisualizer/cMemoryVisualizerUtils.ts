@@ -16,14 +16,14 @@ import { Node } from 'konva/lib/Node';
 import { Shape } from 'konva/lib/Shape';
 import { cloneDeep, isFunction } from 'lodash';
 
-import CEnvVisualizer from './cEnvVisualizer';
-import { Config } from './cEnvVisualizerConfig';
+import CMemoryVisualizer from './cMemoryVisualizer';
+import { Config } from './cMemoryVisualizerConfig';
 import {
   DeepReadonly,
   RecordDetail,
   RecordDetailsMap,
   SnapshotOptions
-} from './cEnvVisualizerTypes';
+} from './cMemoryVisualizerTypes';
 
 export const deepCopyState = (value: ProgramState): ProgramState => {
   const clone = cloneDeep(value);
@@ -133,12 +133,12 @@ export const setUnhoveredStyle = (target: Node | Group, unhoveredAttrs: any = {}
   nodes.forEach(node => {
     node.setAttrs({
       stroke: node.attrs.stroke
-        ? CEnvVisualizer.getPrintableMode()
+        ? CMemoryVisualizer.getPrintableMode()
           ? Config.SA_BLUE.toString()
           : Config.SA_WHITE.toString()
         : node.attrs.stroke,
       fill: node.attrs.fill
-        ? CEnvVisualizer.getPrintableMode()
+        ? CMemoryVisualizer.getPrintableMode()
           ? Config.SA_BLUE.toString()
           : Config.SA_WHITE.toString()
         : node.attrs.fill,
