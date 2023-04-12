@@ -21,7 +21,6 @@ import {
   setSharedbConnected
 } from 'src/commons/collabEditing/CollabEditingActions';
 import SideContentCMemoryVisualizer from 'src/commons/sideContent/SideContentCMemoryVisualizer';
-import SideContentEnvVisualizer from 'src/commons/sideContent/SideContentEnvVisualizer';
 import { useResponsive, useTypedSelector } from 'src/commons/utils/Hooks';
 import {
   browseReplHistoryDown,
@@ -457,7 +456,6 @@ const Playground: React.FC<PlaygroundProps> = ({ workspaceLocation = 'playground
 
   const tabs = React.useMemo(() => {
     const tabs: SideContentTab[] = [playgroundIntroductionTab];
-    tabs.push(envVisualizerTab);
     tabs.push(cMemoryVisualizerTab);
     return tabs;
   }, [playgroundIntroductionTab]);
@@ -677,13 +675,6 @@ const mobileOnlyTabIds: readonly SideContentType[] = [
   SideContentType.mobileEditorRun
 ];
 const desktopOnlyTabIds: readonly SideContentType[] = [SideContentType.introduction];
-
-const envVisualizerTab: SideContentTab = {
-  label: 'Env Visualizer',
-  iconName: IconNames.GLOBE,
-  body: <SideContentEnvVisualizer />,
-  id: SideContentType.envVisualizer
-};
 
 const cMemoryVisualizerTab: SideContentTab = {
   label: 'C Memory Visualizer',

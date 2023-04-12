@@ -97,7 +97,17 @@ class SideContentMemoryVisualizer extends React.Component<
       <div className={Classes.DARK}>
         {this.state.visualization || (
           <p id="env-visualizer-default-text" className={Classes.RUNNING_TEXT}>
-            .
+            The memory model visualizer generates memory model diagrams, particularly the Runtime
+            Stack (RTS) and Heap. Both the RTS and heap uses the same set of memory. The RTS grows
+            upwards (increasing address) while heap grows downwards (decreasing address). This is in
+            line with the C specification of the memory model.
+            <br />
+            <br />
+            It is activated by setting breakpoints before you run the program. You can set a
+            breakpoint by clicking on the gutter of the editor (where all the line numbers are, on
+            the left). When the program runs into a breakpoint, the visualizer displays the state of
+            the environments before the statement is evaluated, which starts in the line in which
+            you set the breakpoint. Every breakpoint must be at the beginning of a statement.
           </p>
         )}
       </div>
