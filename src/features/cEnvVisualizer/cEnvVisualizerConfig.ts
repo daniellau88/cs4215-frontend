@@ -63,7 +63,13 @@ export enum Config {
 
   UnassignedData = '',
   GlobalFrameDefaultText = ':::pre-declared names::',
-  GlobalEnvId = '-1'
+  GlobalEnvId = '-1',
+
+  MemoryBoxAddressWidth = 60,
+  MemoryBoxContentWidth = 130,
+  MemoryBoxDetailsWidth = 70,
+  MemoryBoxDetailsLeftPadding = 10,
+  MemoryBoxHeight = 30
 }
 
 export const ShapeDefaultProps = {

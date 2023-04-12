@@ -11,13 +11,14 @@ import { Visible } from './Visible';
  * Grid contains alternating layers of ArrayLevel and FrameLevel.
  */
 export class MemoryBoxSkipGrid extends Visible {
-  /** list of all levels */
-  static cumHeights: number[];
-
   constructor() {
     super();
-    this._height = 30;
-    this._width = 200;
+    this._height = Config.MemoryBoxHeight;
+    this._width =
+      Config.MemoryBoxAddressWidth +
+      Config.MemoryBoxContentWidth +
+      Config.MemoryBoxDetailsLeftPadding +
+      Config.MemoryBoxDetailsWidth;
   }
 
   setOffsetX(x: number) {
@@ -41,9 +42,9 @@ export class MemoryBoxSkipGrid extends Visible {
       <Group key={Layout.key++} ref={this.ref}>
         <KonvaText
           text={'...'}
-          x={this.x() + 30}
+          x={this.x() + Config.MemoryBoxAddressWidth}
           y={this.y()}
-          width={this.width() - 30 - 50}
+          width={Config.MemoryBoxContentWidth as number}
           height={this.height()}
           align="center"
           verticalAlign="middle"
@@ -51,9 +52,9 @@ export class MemoryBoxSkipGrid extends Visible {
         />
         <Rect
           {...ShapeDefaultProps}
-          x={this.x() + 30}
+          x={this.x() + Config.MemoryBoxAddressWidth}
           y={this.y()}
-          width={this.width() - 30 - 50}
+          width={Config.MemoryBoxContentWidth as number}
           height={this.height()}
           key={Layout.key++}
           stroke={Config.SA_WHITE.toString()}

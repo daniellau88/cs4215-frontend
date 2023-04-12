@@ -204,7 +204,7 @@ export const getToolTipMessageForValue = (
   map: RecordDetailsMap
 ) => {
   const intValue = binaryToInt(binary.binary);
-  if (binary.type === undefined || binary.type.length === 0) return `Value: unknown ${intValue}`;
+  if (binary.type === undefined || binary.type.length === 0) return `unknown ${intValue}`;
 
   const firstType = binary.type[0].subtype;
   switch (firstType) {

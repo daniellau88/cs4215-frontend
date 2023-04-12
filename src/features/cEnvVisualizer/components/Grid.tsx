@@ -79,7 +79,7 @@ export class Grid extends Visible {
       } else {
         this.labelRef.current.hide();
       }
-    }
+    };
     if (!this.rtsMemoryGrid) {
       this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map, snapshotOptions, setTooltipDetail);
     } else {
@@ -87,7 +87,13 @@ export class Grid extends Visible {
     }
 
     if (!this.heapMemoryGrid) {
-      this.heapMemoryGrid = new MemoryGrid(heapSnapshot, map, snapshotOptions, setTooltipDetail, true);
+      this.heapMemoryGrid = new MemoryGrid(
+        heapSnapshot,
+        map,
+        snapshotOptions,
+        setTooltipDetail,
+        true
+      );
     } else {
       this.heapMemoryGrid.update(heapSnapshot, map, true);
     }
@@ -124,10 +130,7 @@ export class Grid extends Visible {
         {this.rtsMemoryGrid?.draw()}
         {this.heapMemoryGrid?.draw()}
 
-        <KonvaLabel
-          visible={false}
-          ref={this.labelRef}
-        >
+        <KonvaLabel visible={false} ref={this.labelRef}>
           <KonvaTag stroke="black" fill={'black'} opacity={Number(Config.FnTooltipOpacity)} />
           <KonvaText
             fontFamily={Config.FontFamily.toString()}

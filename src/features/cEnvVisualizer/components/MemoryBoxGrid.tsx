@@ -25,9 +25,6 @@ import { Visible } from './Visible';
  * Grid contains alternating layers of ArrayLevel and FrameLevel.
  */
 export class MemoryBoxGrid extends Visible {
-  /** list of all levels */
-  widths: number[];
-  static cumHeights: number[];
   readonly boxText: string;
   readonly boxDetails: string;
   readonly tooltip: string;
@@ -44,9 +41,12 @@ export class MemoryBoxGrid extends Visible {
     super();
     this._x = 0;
     this._y = 0;
-    this.widths = [];
-    this._height = 30;
-    this._width = 200;
+    this._height = Config.MemoryBoxHeight;
+    this._width =
+      Config.MemoryBoxAddressWidth +
+      Config.MemoryBoxContentWidth +
+      Config.MemoryBoxDetailsLeftPadding +
+      Config.MemoryBoxDetailsWidth;
     this.boxText = binaryToFormattedString(binaryType.binary, binaryType.type);
 
     if (details !== undefined && details.length > 0) {
@@ -91,7 +91,7 @@ export class MemoryBoxGrid extends Visible {
     this.setTooltipDetails({
       tooltipMessage: this.tooltip,
       x: this.x() + this.width() + Config.TextPaddingX * 2,
-      y: this.y() - Config.TextPaddingY,
+      y: this.y() - Config.TextPaddingY
     });
     setHoveredStyle(this.ref.current);
   };
@@ -108,7 +108,7 @@ export class MemoryBoxGrid extends Visible {
           text={this.address.toString()}
           x={this.x()}
           y={this.y()}
-          width={30}
+          width={Config.MemoryBoxAddressWidth as number}
           height={this.height()}
           align="center"
           verticalAlign="middle"
@@ -116,9 +116,9 @@ export class MemoryBoxGrid extends Visible {
         />
         <KonvaText
           text={this.boxText || 'empty'}
-          x={this.x() + 30}
+          x={this.x() + Config.MemoryBoxAddressWidth}
           y={this.y()}
-          width={this.width() - 30 - 50}
+          width={Config.MemoryBoxContentWidth as number}
           height={this.height()}
           align="center"
           verticalAlign="middle"
@@ -126,9 +126,14 @@ export class MemoryBoxGrid extends Visible {
         />
         <KonvaText
           text={this.boxDetails}
-          x={this.x() + 150 + 10}
+          x={
+            this.x() +
+            Config.MemoryBoxAddressWidth +
+            Config.MemoryBoxContentWidth +
+            Config.MemoryBoxDetailsLeftPadding
+          }
           y={this.y()}
-          width={this.width() - 30 - 50}
+          width={Config.MemoryBoxDetailsWidth as number}
           height={this.height()}
           align="left"
           verticalAlign="middle"
@@ -136,9 +141,9 @@ export class MemoryBoxGrid extends Visible {
         />
         <Rect
           {...ShapeDefaultProps}
-          x={this.x() + 30}
+          x={this.x() + Config.MemoryBoxAddressWidth}
           y={this.y()}
-          width={this.width() - 30 - 50}
+          width={Config.MemoryBoxContentWidth as number}
           height={this.height()}
           key={Layout.key++}
           stroke={Config.SA_WHITE.toString()}
