@@ -27,6 +27,7 @@ export function visualizeCEnv({ context }: { context: Context }) {
   try {
     CEnvVisualizer.drawEnv(context);
   } catch (err) {
+    console.error(err);
     throw new Error('C Env visualizer is not enabled');
   }
 }
@@ -71,7 +72,6 @@ export function createContext<T>(
 ) {
   return createSlangContext<T>(variant, externals, externalContext, externalBuiltIns);
 }
-
 
 // Given a Context, returns a privileged Context that when referenced,
 // intercepts reads from the underlying Context and returns desired values

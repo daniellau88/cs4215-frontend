@@ -1,12 +1,22 @@
 import { BinaryWithOptionalType } from 'c-slang/dist/interpreter/typings';
 import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
 import React from 'react';
-import { Group, Rect, Text } from 'react-konva';
+import { Group, Label as KonvaLabel, Rect, Tag as KonvaTag, Text as KonvaText } from 'react-konva';
 
 import { Config, ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
-import { DeepReadonly } from '../cEnvVisualizerTypes';
-import { RecordDetail } from '../cEnvVisualizerUtils';
+import {
+  DeepReadonly,
+  RecordDetail,
+  RecordDetailsMap,
+  SnapshotOptions
+} from '../cEnvVisualizerTypes';
+import {
+  getTooltipMessageForReference,
+  getToolTipMessageForValue,
+  setHoveredStyle,
+  setUnhoveredStyle
+} from '../cEnvVisualizerUtils';
 import { Visible } from './Visible';
 
 /**
@@ -17,70 +27,110 @@ export class MemoryBoxGrid extends Visible {
   /** list of all levels */
   widths: number[];
   static cumHeights: number[];
-  boxText: string;
-  boxDetails: string;
+  readonly boxText: string;
+  readonly boxDetails: string;
+  readonly labelRef: React.RefObject<any> = React.createRef();
+  readonly tooltip: string;
 
   constructor(
     /** the environment tree nodes */
     readonly address: number,
     readonly binaryType: BinaryWithOptionalType,
+    readonly snapshotOptions: DeepReadonly<SnapshotOptions>,
+    readonly map: RecordDetailsMap,
     readonly details?: DeepReadonly<Array<RecordDetail>>
   ) {
     super();
     this._x = 0;
     this._y = 0;
-    // this.frameLevels = [];
-    // this.arrayLevels = [];
-    // this.levels = [];
     this.widths = [];
     this._height = 30;
-    this._width = 180;
-    this.boxText = '';
-    this.boxDetails = '';
-    this.update(address, binaryType, details);
+    this._width = 200;
+    this.boxText = binaryToFormattedString(binaryType.binary, binaryType.type);
+
+    if (details !== undefined && details.length > 0) {
+      const topDetail = details[0];
+      const hasMore = details.length > 1;
+      if (topDetail.subtype === 'stack_pointer') {
+        this.boxDetails = `${topDetail.funcName} stack pointer`;
+      } else if (topDetail.subtype === 'variable') {
+        this.boxDetails = `${topDetail.funcName}.${topDetail.varName}${hasMore ? ', ...' : ''}`;
+      } else {
+        this.boxDetails = '';
+      }
+    } else {
+      this.boxDetails = '';
+    }
+
+    const valueToolTip = `Actual memory value:\n${getToolTipMessageForValue(
+      binaryType,
+      snapshotOptions,
+      map
+    )}`;
+
+    if (details) {
+      const referenceTooltip = details
+        .map(x => getTooltipMessageForReference(x, snapshotOptions, map))
+        .join('\n\n');
+      this.tooltip = referenceTooltip + '\n\n' + valueToolTip;
+    } else {
+      this.tooltip = valueToolTip;
+    }
+  }
+
+  setOffsetX(x: number) {
+    this._offsetX = x;
   }
 
   setY(y: number) {
     this._y = y;
   }
 
-  destroy = () => {
-    // this.frameLevels.forEach(l => l.ref.current.destroyChildren());
+  onMouseEnter = () => {
+    if (this.tooltip) {
+      this.labelRef.current.moveToTop();
+      this.labelRef.current.show();
+    }
+    setHoveredStyle(this.ref.current);
   };
 
-  /**
-   * Processes updates to Layout.environmentTree.
-   * @param envTreeNodes an array of different arrays of EnvTreeNodes corresponding to a single level.
-   */
-  update(
-    address: number,
-    binaryType: BinaryWithOptionalType,
-    details?: DeepReadonly<Array<RecordDetail>>
-  ) {
-    this.boxText = binaryToFormattedString(binaryType.binary, binaryType.type);
-
-    if (details !== undefined && details.length > 0) {
-      const topDetail = details[0];
-      if (topDetail.subtype === 'stack_pointer') {
-        this.boxDetails = `${topDetail.funcName} Stack Pointer`;
-      } else {
-        this.boxDetails = `${topDetail.funcName}.${topDetail.varName}`;
-      }
-    } else {
-      this.boxDetails = '';
+  onMouseLeave = () => {
+    if (this.tooltip) {
+      this.labelRef.current.hide();
     }
-  }
+    setUnhoveredStyle(this.ref.current);
+  };
 
   draw(): React.ReactNode {
     return (
-      <Group key={Layout.key++}>
-        <Text
+      <Group key={Layout.key++} ref={this.ref}>
+        <KonvaText
           text={this.address.toString()}
           x={this.x()}
           y={this.y()}
           width={30}
           height={this.height()}
           align="center"
+          verticalAlign="middle"
+          fill={Config.SA_WHITE.toString()}
+        />
+        <KonvaText
+          text={this.boxText || 'empty'}
+          x={this.x() + 30}
+          y={this.y()}
+          width={this.width() - 30 - 50}
+          height={this.height()}
+          align="center"
+          verticalAlign="middle"
+          fill={Config.SA_WHITE.toString()}
+        />
+        <KonvaText
+          text={this.boxDetails}
+          x={this.x() + 150 + 10}
+          y={this.y()}
+          width={this.width() - 30 - 50}
+          height={this.height()}
+          align="left"
           verticalAlign="middle"
           fill={Config.SA_WHITE.toString()}
         />
@@ -91,29 +141,31 @@ export class MemoryBoxGrid extends Visible {
           width={this.width() - 30 - 50}
           height={this.height()}
           key={Layout.key++}
-          listening={false}
           stroke={Config.SA_WHITE.toString()}
+          onClick={e => {
+            console.log('hiiii');
+          }}
+          onMouseEnter={() => this.onMouseEnter()}
+          onMouseLeave={() => this.onMouseLeave()}
         />
-        <Text
-          text={this.boxText || 'empty'}
-          x={this.x() + 30}
-          y={this.y()}
-          width={this.width() - 30 - 50}
-          height={this.height()}
-          align="center"
-          verticalAlign="middle"
-          fill={Config.SA_WHITE.toString()}
-        />
-        <Text
-          text={this.boxDetails}
-          x={this.x() + 130 + 10}
-          y={this.y()}
-          width={this.width() - 30 - 50}
-          height={this.height()}
-          align="left"
-          verticalAlign="middle"
-          fill={Config.SA_WHITE.toString()}
-        />
+        <KonvaLabel
+          x={this.x() + this.width() + Config.TextPaddingX * 2}
+          y={this.y() - Config.TextPaddingY}
+          visible={false}
+          ref={this.labelRef}
+        >
+          <KonvaTag stroke="black" fill={'black'} opacity={Number(Config.FnTooltipOpacity)} />
+          <KonvaText
+            text={this.tooltip}
+            fontFamily={Config.FontFamily.toString()}
+            fontSize={Number(Config.FontSize)}
+            fontStyle={Config.FontStyle.toString()}
+            fill={Config.SA_WHITE.toString()}
+            wrap="char"
+            padding={5}
+            width={300}
+          />
+        </KonvaLabel>
       </Group>
     );
   }

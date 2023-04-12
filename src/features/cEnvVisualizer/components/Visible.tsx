@@ -7,14 +7,16 @@ import { RefObject } from 'react';
 export abstract class Visible {
   protected _x: number = 0;
   protected _y: number = 0;
+  protected _offsetX: number = 0;
+  protected _offsetY: number = 0;
   protected _width: number = 0;
   protected _height: number = 0;
   protected _isDrawn: boolean = false;
   x(): number {
-    return this._x;
+    return this._x + this._offsetX;
   }
   y(): number {
-    return this._y;
+    return this._y + this._offsetY;
   }
   width(): number {
     return this._width;

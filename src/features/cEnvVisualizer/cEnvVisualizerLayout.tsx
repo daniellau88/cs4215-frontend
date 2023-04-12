@@ -1,4 +1,3 @@
-import { Button, ButtonGroup, Checkbox } from '@blueprintjs/core';
 import { ProgramState } from 'c-slang/dist/interpreter/programState';
 import React, { RefObject } from 'react';
 import { Layer, Rect, Stage } from 'react-konva';
@@ -147,66 +146,6 @@ export class Layout {
                   : Config.SA_BLUE.toString()
               }}
             >
-              <div style={{ right: 40, position: 'absolute', display: 'flex', alignSelf: 'right' }}>
-                <ButtonGroup vertical>
-                  <Button
-                    large={true}
-                    outlined={true}
-                    style={{
-                      backgroundColor: CEnvVisualizer.getPrintableMode()
-                        ? Config.PRINT_BACKGROUND.toString()
-                        : Config.SA_BLUE.toString(),
-                      opacity: 0.8,
-                      borderColor: CEnvVisualizer.getPrintableMode()
-                        ? Config.SA_BLUE.toString()
-                        : Config.PRINT_BACKGROUND.toString()
-                    }}
-                    onMouseUp={() => {
-                      CEnvVisualizer.toggleCompactLayout();
-                      CEnvVisualizer.redraw();
-                    }}
-                  >
-                    <Checkbox
-                      checked={!CEnvVisualizer.getCompactLayout()}
-                      label="Experimental"
-                      style={{
-                        marginBottom: '0px',
-                        color: CEnvVisualizer.getPrintableMode()
-                          ? Config.SA_BLUE.toString()
-                          : Config.PRINT_BACKGROUND.toString()
-                      }}
-                    />
-                  </Button>
-                  <Button
-                    large={true}
-                    outlined={true}
-                    style={{
-                      backgroundColor: CEnvVisualizer.getPrintableMode()
-                        ? Config.PRINT_BACKGROUND.toString()
-                        : Config.SA_BLUE.toString(),
-                      opacity: 0.8,
-                      borderColor: CEnvVisualizer.getPrintableMode()
-                        ? Config.SA_BLUE.toString()
-                        : Config.PRINT_BACKGROUND.toString()
-                    }}
-                    onMouseUp={() => {
-                      CEnvVisualizer.togglePrintableMode();
-                      CEnvVisualizer.redraw();
-                    }}
-                  >
-                    <Checkbox
-                      checked={CEnvVisualizer.getPrintableMode()}
-                      label="Printable"
-                      style={{
-                        marginBottom: '0px',
-                        color: CEnvVisualizer.getPrintableMode()
-                          ? Config.SA_BLUE.toString()
-                          : Config.PRINT_BACKGROUND.toString()
-                      }}
-                    />
-                  </Button>
-                </ButtonGroup>
-              </div>
               <Stage width={Layout.stageWidth} height={Layout.stageHeight} ref={this.stageRef}>
                 <Layer>
                   <Rect

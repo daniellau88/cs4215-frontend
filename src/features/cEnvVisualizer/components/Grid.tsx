@@ -4,6 +4,7 @@ import { Group, Rect } from 'react-konva';
 
 import { ShapeDefaultProps } from '../cEnvVisualizerConfig';
 import { Layout } from '../cEnvVisualizerLayout';
+import { DeepReadonly, SnapshotOptions } from '../cEnvVisualizerTypes';
 import {
   createRecordDetailMap,
   populateRecordDetailMapWithEnv,
@@ -31,14 +32,17 @@ export class Grid extends Visible {
     super();
     this._x = 0;
     this._y = 0;
-    // this.frameLevels = [];
-    // this.arrayLevels = [];
-    // this.levels = [];
     this.widths = [];
     Grid.cumHeights = [];
     this._height = 0;
     this._width = 0;
     this.update(state);
+  }
+
+  setOffsetX(x: number) {
+    this._offsetX = x;
+    this.rtsMemoryGrid?.setOffsetX(this.x());
+    this.heapMemoryGrid?.setOffsetX(this.x());
   }
 
   destroy = () => {
@@ -52,6 +56,10 @@ export class Grid extends Visible {
   update(state: ProgramState) {
     const rtsSnapshot = state.getRTSSnapshot();
     const heapSnapshot = state.getHeapSnapshot();
+    const snapshotOptions = {
+      rts: rtsSnapshot,
+      heap: heapSnapshot
+    } as DeepReadonly<SnapshotOptions>;
     const env = state.getE();
     const rtsStart = state.getRTSStart();
     const map = createRecordDetailMap();
@@ -59,16 +67,17 @@ export class Grid extends Visible {
     populateRecordDetailMapWithStackPointer(map, rtsStart, rtsSnapshot, env);
 
     if (!this.rtsMemoryGrid) {
-      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map);
+      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map, snapshotOptions);
     } else {
       this.rtsMemoryGrid.update(rtsSnapshot, map);
     }
 
     if (!this.heapMemoryGrid) {
-      this.heapMemoryGrid = new MemoryGrid(heapSnapshot, map);
+      this.heapMemoryGrid = new MemoryGrid(heapSnapshot, map, snapshotOptions, true);
     } else {
-      this.heapMemoryGrid.update(heapSnapshot, map);
+      this.heapMemoryGrid.update(heapSnapshot, map, true);
     }
+    this.heapMemoryGrid.setX(300);
   }
 
   /**
