@@ -69,7 +69,9 @@ export enum Config {
   MemoryBoxContentWidth = 130,
   MemoryBoxDetailsWidth = 70,
   MemoryBoxDetailsLeftPadding = 10,
-  MemoryBoxHeight = 30
+  MemoryBoxHeight = 30,
+
+  MemoryGridTitleHeight = 40
 }
 
 export const ShapeDefaultProps = {

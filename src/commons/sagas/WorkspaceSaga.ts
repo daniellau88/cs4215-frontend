@@ -327,6 +327,7 @@ function* updateInspector(workspaceLocation: WorkspaceLocation): SagaIterator {
     yield put(actions.highlightEditorLine([start, end], workspaceLocation));
     visualizeCEnv(lastDebuggerResult);
     visualizeEnv(lastDebuggerResult);
+    console.log('called');
   } catch (e) {
     yield put(actions.highlightEditorLine([], workspaceLocation));
     // most likely harmless, we can pretty much ignore this.

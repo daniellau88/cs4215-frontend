@@ -1,8 +1,8 @@
 import { BinaryWithOptionalType } from 'c-slang/dist/interpreter/typings';
 import React from 'react';
-import { Group, Rect } from 'react-konva';
+import { Group, Rect, Text as KonvaText } from 'react-konva';
 
-import { ShapeDefaultProps } from '../cMemoryVisualizerConfig';
+import { Config, ShapeDefaultProps } from '../cMemoryVisualizerConfig';
 import { Layout } from '../cMemoryVisualizerLayout';
 import {
   DeepReadonly,
@@ -22,14 +22,10 @@ type Snapshot = DeepReadonly<Record<number, BinaryWithOptionalType>>;
  * Grid contains alternating layers of ArrayLevel and FrameLevel.
  */
 export class MemoryGrid extends Visible {
-  /** list of all levels */
-  widths: number[];
-  static cumHeights: number[];
-
   memoryBoxes: Array<MemoryBoxSkipGrid | MemoryBoxGrid>;
 
   constructor(
-    /** the environment tree nodes */
+    readonly title: string,
     readonly snapshot: Snapshot,
     readonly map: RecordDetailsMap,
     readonly snapshotOptions: DeepReadonly<SnapshotOptions>,
@@ -41,10 +37,13 @@ export class MemoryGrid extends Visible {
     this._y = 0;
     this._offsetX = 0;
     this._offsetY = 0;
-    this.widths = [];
     this.memoryBoxes = [];
     this._height = 0;
-    this._width = 0;
+    this._width =
+      Config.MemoryBoxAddressWidth +
+      Config.MemoryBoxContentWidth +
+      Config.MemoryBoxDetailsLeftPadding +
+      Config.MemoryBoxDetailsWidth;
     this.update(snapshot, map, reverse);
   }
 
@@ -72,7 +71,7 @@ export class MemoryGrid extends Visible {
     if (reverse) keys.reverse();
 
     const newMemoryBoxes: Array<MemoryBoxSkipGrid | MemoryBoxGrid> = [];
-    let lastY = 0;
+    let lastY: number = Config.MemoryGridTitleHeight;
     let lastKey = -1;
     keys.forEach(key => {
       const keyInt = parseInt(key);
@@ -105,6 +104,7 @@ export class MemoryGrid extends Visible {
   }
 
   draw(): React.ReactNode {
+    console.log('title', this.title);
     return (
       <Group key={Layout.key++}>
         <Rect
@@ -117,6 +117,17 @@ export class MemoryGrid extends Visible {
           listening={false}
         />
         {this.memoryBoxes.map(box => box.draw())}
+        <KonvaText
+          text={this.title}
+          x={this.x()}
+          y={this.y()}
+          width={this.width()}
+          fontSize={30}
+          height={Config.MemoryGridTitleHeight as number}
+          align="center"
+          verticalAlign="middle"
+          fill={Config.SA_WHITE.toString()}
+        />
       </Group>
     );
   }

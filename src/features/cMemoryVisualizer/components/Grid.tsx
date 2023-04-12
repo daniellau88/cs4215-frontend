@@ -81,13 +81,14 @@ export class Grid extends Visible {
       }
     };
     if (!this.rtsMemoryGrid) {
-      this.rtsMemoryGrid = new MemoryGrid(rtsSnapshot, map, snapshotOptions, setTooltipDetail);
+      this.rtsMemoryGrid = new MemoryGrid('RTS', rtsSnapshot, map, snapshotOptions, setTooltipDetail);
     } else {
       this.rtsMemoryGrid.update(rtsSnapshot, map);
     }
 
     if (!this.heapMemoryGrid) {
       this.heapMemoryGrid = new MemoryGrid(
+        'Heap',
         heapSnapshot,
         map,
         snapshotOptions,
