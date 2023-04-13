@@ -82,22 +82,34 @@ export const populateRecordDetailMapWithStackPointer = (
   const envFuncNames: Array<string> = env.map(x => x.name);
   let currentStackPointer = rtsStart;
   let i = envFuncNames.length - 1;
-  while (true) {
+  while (i > 0) {
     if (currentStackPointer === -1) {
       break;
     }
 
-    if (map.memory[currentStackPointer] === undefined) map.memory[currentStackPointer] = [];
-    map.memory[currentStackPointer].push({
-      subtype: 'stack_pointer',
-      funcName: envFuncNames[i],
-      address: currentStackPointer
-    });
+    let currentScope = env[i].varScope;
+    // Ignores the function scope and global scope
+    while (currentScope.parent?.parent?.parent) {
+      if (map.memory[currentStackPointer] === undefined) map.memory[currentStackPointer] = [];
+      map.memory[currentStackPointer].push({
+        subtype: 'stack_pointer',
+        funcName: envFuncNames[i],
+        address: currentStackPointer
+      });
 
-    const entry = rtsSnapshot[currentStackPointer];
-    currentStackPointer = binaryToInt(entry.binary);
+      const entry = rtsSnapshot[currentStackPointer];
+      currentStackPointer = binaryToInt(entry.binary);
+      currentScope = currentScope.parent;
+    }
     i--;
   }
+
+  // First pointer is always global
+  map.memory[0] = [{
+    subtype: 'stack_pointer',
+    funcName: envFuncNames[0],
+    address: 0
+  }];
 };
 
 export const setHoveredCursor = (target: Node | Group) => {
