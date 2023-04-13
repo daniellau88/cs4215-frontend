@@ -285,19 +285,12 @@ export const getTooltipMessageForReference = (
           if (pointerValue !== undefined) {
             const actual = getValueByAddressFromSnapshotOptions(pointerValue, snapshotOptions);
             if (actual) {
-              const actualType: ProgramType | undefined = actual.type
-                ? ([
-                    ...actual.type.map(x => {
-                      return { ...x };
-                    })
-                  ] as ProgramType)
-                : undefined;
-              retString += `\nDereferenced Value: ${binaryToFormattedString(
+              retString += `\nDereferenced value: ${binaryToFormattedString(
                 actual.binary,
-                actualType as ProgramType
+                newType
               )}`;
             } else {
-              retString += '\nDereferenced Value: Garbage Value';
+              retString += '\nDereferenced value: Garbage value';
             }
           }
         }
@@ -310,10 +303,10 @@ export const getTooltipMessageForReference = (
           getValueByAddressFromSnapshotOptions(address, snapshotOptions) as BinaryWithOptionalType
       );
       const itemsString = items.map(x => {
-        if (x === undefined) return 'Garbage Value';
+        if (x === undefined) return 'Garbage value';
         return binaryToFormattedString(x.binary, x.type);
       });
-      retString += `\nArray Value: [${itemsString.join(', ')}]`;
+      retString += `\nArray value: [${itemsString.join(', ')}]`;
     }
     return retString;
   }

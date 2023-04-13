@@ -63,7 +63,7 @@ export class MemoryBoxGrid extends Visible {
       this.boxDetails = '';
     }
 
-    const valueToolTip = `Memory value:\n${getToolTipMessageForValue(
+    const valueToolTip = `Suggested value:\n${getToolTipMessageForValue(
       binaryType,
       snapshotOptions,
       map
