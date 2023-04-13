@@ -1,13 +1,10 @@
 /* tslint:disable: ban-types*/
 import createSlangContext from 'c-slang/dist/createContext';
 import { BinaryWithType } from 'c-slang/dist/interpreter/typings';
-import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
 import { Context, CustomBuiltIns, Variant } from 'c-slang/dist/types';
 import { difference, keys } from 'lodash';
 import CMemoryVisualizer from 'src/features/cMemoryVisualizer/cMemoryVisualizer';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
-
-import DisplayBufferService from './DisplayBufferService';
 
 /**
  * This file contains wrappers for certain functions
@@ -17,10 +14,6 @@ import DisplayBufferService from './DisplayBufferService';
  */
 
 function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {
-  args.forEach(x => {
-    const output = binaryToFormattedString(x.binary, x.type);
-    DisplayBufferService.push(output, workspaceLocation);
-  });
 }
 
 export function visualizeCEnv({ context }: { context: Context }) {

@@ -1,6 +1,6 @@
 import { Context, interrupt, resume, runInContext } from 'c-slang';
 import { InterruptedError } from 'c-slang/dist/errors/errors';
-import { isMicrocode } from 'c-slang/dist/interpreter/utils/utils';
+import { binaryToFormattedString, isMicrocode } from 'c-slang/dist/interpreter/utils/utils';
 import { parse } from 'c-slang/dist/parser/parser';
 import { Chapter, Result, Variant } from 'c-slang/dist/types';
 import { random } from 'lodash';
@@ -569,6 +569,24 @@ export function* evalCode(
     interrupted: take(BEGIN_INTERRUPT_EXECUTION),
     paused: take(BEGIN_DEBUG_PAUSE)
   });
+
+  if (result) {
+    // Add console logs and warning outputs to frontend logs
+    const actualResult = result as Result;
+    if (actualResult.status === 'finished' || actualResult.status === 'suspended') {
+      const context = actualResult.context;
+      const logOutputs = context.programState.getLogOutput();
+      logOutputs.forEach(x => {
+        const output = binaryToFormattedString(x.binary, x.type);
+        DisplayBufferService.push(output, workspaceLocation);
+      });
+      const warningOutputs = context.programState.getWarningOutputs();
+      warningOutputs.forEach(x => {
+        DisplayBufferService.push(`Warning: (Line ${x.node.loc.start.line}) ${x.message}`, workspaceLocation);
+      })
+    }
+  }
+
   if (interrupted) {
     interrupt(context);
     /* Redundancy, added ensure that interruption results in an error. */
@@ -609,6 +627,7 @@ export function* evalCode(
     return;
   } else if (result.status === 'suspended') {
     yield put(actions.endDebuggerPause(workspaceLocation));
+    yield* dumpDisplayBuffer(workspaceLocation);
     yield put(actions.evalInterpreterSuccess('Breakpoint hit!', workspaceLocation));
     return;
   }
