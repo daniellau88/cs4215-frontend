@@ -104,7 +104,6 @@ export class MemoryGrid extends Visible {
   }
 
   draw(): React.ReactNode {
-    console.log('title', this.title);
     return (
       <Group key={Layout.key++}>
         <Rect
