@@ -2,7 +2,7 @@ import { Context, interrupt, resume, runInContext } from 'c-slang';
 import { InterruptedError } from 'c-slang/dist/errors/errors';
 import { binaryToFormattedString, isMicrocode } from 'c-slang/dist/interpreter/utils/utils';
 import { parse } from 'c-slang/dist/parser/parser';
-import { Chapter, Result, Variant } from 'c-slang/dist/types';
+import { Chapter, Result, Suspended, Variant } from 'c-slang/dist/types';
 import { random } from 'lodash';
 import Phaser from 'phaser';
 import { SagaIterator } from 'redux-saga';
@@ -322,12 +322,11 @@ function* updateInspector(workspaceLocation: WorkspaceLocation): SagaIterator {
     if (nextInstruction === undefined) return;
     const node = isMicrocode(nextInstruction) ? nextInstruction.node : nextInstruction;
     const start = node.loc.start.line - 1;
-    const end = node.loc.end.line - 1;
+    const end = node.loc.end.line - 1 + 1;
 
     yield put(actions.highlightEditorLine([start, end], workspaceLocation));
     visualizeCEnv(lastDebuggerResult);
     visualizeEnv(lastDebuggerResult);
-    console.log('called');
   } catch (e) {
     yield put(actions.highlightEditorLine([], workspaceLocation));
     // most likely harmless, we can pretty much ignore this.
@@ -582,8 +581,11 @@ export function* evalCode(
       });
       const warningOutputs = context.programState.getWarningOutputs();
       warningOutputs.forEach(x => {
-        DisplayBufferService.push(`Warning: (Line ${x.node.loc.start.line}) ${x.message}`, workspaceLocation);
-      })
+        DisplayBufferService.push(
+          `Warning: (Line ${x.node.loc.start.line}) ${x.message}`,
+          workspaceLocation
+        );
+      });
     }
   }
 
@@ -626,9 +628,17 @@ export function* evalCode(
     yield put(actions.addEvent(events));
     return;
   } else if (result.status === 'suspended') {
+    const actualResult = result as Suspended;
+    const nextInstr = actualResult.context.programState.peekA();
+    const node = nextInstr && (isMicrocode(nextInstr) ? nextInstr.node : nextInstr);
     yield put(actions.endDebuggerPause(workspaceLocation));
     yield* dumpDisplayBuffer(workspaceLocation);
-    yield put(actions.evalInterpreterSuccess('Breakpoint hit!', workspaceLocation));
+    yield put(
+      actions.evalInterpreterSuccess(
+        `Breakpoint hit${node ? ` at Line ${node.loc.start.line}!` : ''}`,
+        workspaceLocation
+      )
+    );
     return;
   }
   yield* dumpDisplayBuffer(workspaceLocation);

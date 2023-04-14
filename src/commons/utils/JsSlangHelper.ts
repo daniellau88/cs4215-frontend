@@ -13,8 +13,7 @@ import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
  * Use this file especially when attempting to create a slang Context.
  */
 
-function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {
-}
+function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {}
 
 export function visualizeCEnv({ context }: { context: Context }) {
   try {
