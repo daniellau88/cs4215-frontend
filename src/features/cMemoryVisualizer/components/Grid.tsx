@@ -30,7 +30,7 @@ export class Grid extends Visible {
 
   constructor(
     /** the environment tree nodes */
-    readonly state: ProgramState
+    state: ProgramState
   ) {
     super();
     this._x = 0;
@@ -81,9 +81,15 @@ export class Grid extends Visible {
       }
     };
     if (!this.rtsMemoryGrid) {
-      this.rtsMemoryGrid = new MemoryGrid('RTS', rtsSnapshot, map, snapshotOptions, setTooltipDetail);
+      this.rtsMemoryGrid = new MemoryGrid(
+        'RTS',
+        rtsSnapshot,
+        map,
+        snapshotOptions,
+        setTooltipDetail
+      );
     } else {
-      this.rtsMemoryGrid.update(rtsSnapshot, map);
+      this.rtsMemoryGrid.update(rtsSnapshot, map, snapshotOptions);
     }
 
     if (!this.heapMemoryGrid) {
@@ -96,7 +102,7 @@ export class Grid extends Visible {
         true
       );
     } else {
-      this.heapMemoryGrid.update(heapSnapshot, map, true);
+      this.heapMemoryGrid.update(heapSnapshot, map, snapshotOptions, true);
     }
     this.heapMemoryGrid.setX(300);
   }

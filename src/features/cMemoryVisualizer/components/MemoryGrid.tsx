@@ -28,7 +28,7 @@ export class MemoryGrid extends Visible {
     readonly title: string,
     readonly snapshot: Snapshot,
     readonly map: RecordDetailsMap,
-    readonly snapshotOptions: DeepReadonly<SnapshotOptions>,
+    snapshotOptions: DeepReadonly<SnapshotOptions>,
     readonly setTooltipDetails: (details?: TooltipDetails) => void,
     reverse: boolean = false
   ) {
@@ -44,7 +44,7 @@ export class MemoryGrid extends Visible {
       Config.MemoryBoxContentWidth +
       Config.MemoryBoxDetailsLeftPadding +
       Config.MemoryBoxDetailsWidth;
-    this.update(snapshot, map, reverse);
+    this.update(snapshot, map, snapshotOptions, reverse);
   }
 
   destroy = () => {
@@ -65,7 +65,12 @@ export class MemoryGrid extends Visible {
    * Processes updates to Layout.environmentTree.
    * @param envTreeNodes an array of different arrays of EnvTreeNodes corresponding to a single level.
    */
-  update(snapshot: Snapshot, map: RecordDetailsMap, reverse: boolean = false) {
+  update(
+    snapshot: Snapshot,
+    map: RecordDetailsMap,
+    snapshotOptions: DeepReadonly<SnapshotOptions>,
+    reverse: boolean = false
+  ) {
     const keys = Object.keys(snapshot);
     keys.sort((x, y) => parseInt(x) - parseInt(y)); // keys are in string
     if (reverse) keys.reverse();
@@ -88,7 +93,7 @@ export class MemoryGrid extends Visible {
       const memoryBox = new MemoryBoxGrid(
         keyInt,
         value,
-        this.snapshotOptions,
+        snapshotOptions,
         map,
         this.setTooltipDetails,
         details

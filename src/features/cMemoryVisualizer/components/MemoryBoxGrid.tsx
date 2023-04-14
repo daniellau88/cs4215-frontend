@@ -33,7 +33,7 @@ export class MemoryBoxGrid extends Visible {
     /** the environment tree nodes */
     readonly address: number,
     readonly binaryType: BinaryWithOptionalType,
-    readonly snapshotOptions: DeepReadonly<SnapshotOptions>,
+    snapshotOptions: DeepReadonly<SnapshotOptions>,
     readonly map: RecordDetailsMap,
     readonly setTooltipDetails: (details?: TooltipDetails) => void,
     readonly details?: DeepReadonly<Array<RecordDetail>>

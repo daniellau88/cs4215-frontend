@@ -8,6 +8,7 @@ import {
 import { decrementPointerDepth, getArrayItems } from 'c-slang/dist/interpreter/utils/typeUtils';
 import {
   binaryToFormattedString,
+  binaryToHexString,
   binaryToInt,
   intToBinary
 } from 'c-slang/dist/interpreter/utils/utils';
@@ -105,11 +106,13 @@ export const populateRecordDetailMapWithStackPointer = (
   }
 
   // First pointer is always global
-  map.memory[0] = [{
-    subtype: 'stack_pointer',
-    funcName: envFuncNames[0],
-    address: 0
-  }];
+  map.memory[0] = [
+    {
+      subtype: 'stack_pointer',
+      funcName: envFuncNames[0],
+      address: 0
+    }
+  ];
 };
 
 export const setHoveredCursor = (target: Node | Group) => {
@@ -215,13 +218,19 @@ export const getToolTipMessageForValue = (
   snapshotOptions: DeepReadonly<SnapshotOptions>,
   map: RecordDetailsMap
 ) => {
-  const intValue = binaryToInt(binary.binary);
-  if (binary.type === undefined || binary.type.length === 0) return `unknown ${intValue}`;
+  if (binary.type === undefined || binary.type.length === 0)
+    return `unknown ${binaryToHexString(binary.binary)}`;
 
+  const intValue = binaryToInt(binary.binary);
   const firstType = binary.type[0].subtype;
   switch (firstType) {
-    case 'BaseType':
+    case 'BaseType': {
+      // If it is character, print int value as well (null char can't be printed)
+      if (binary.type[0].baseType === 'char') {
+        return `char ${String.fromCharCode(intValue)} (int value: ${intValue})`;
+      }
       return binaryToFormattedString(binary.binary, binary.type);
+    }
     case 'Pointer': {
       const pointerType = decrementPointerDepth(binary.type);
       if (pointerType.length === 0) return `pointer ${intValue}`;
