@@ -1,12 +1,11 @@
 /* tslint:disable: ban-types*/
-import createSlangContext from 'calc-slang/dist/createContext';
-import { Context, Value, Variant } from 'calc-slang/dist/types';
-import { stringify } from 'calc-slang/dist/utils/stringify';
+import createSlangContext from 'c-slang/dist/createContext';
+import { BinaryWithType } from 'c-slang/dist/interpreter/typings';
+import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
+import { Context, Variant } from 'c-slang/dist/types';
 import { difference, keys } from 'lodash';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
 
-import DataVisualizer from '../../features/dataVisualizer/dataVisualizer';
-import { Data } from '../../features/dataVisualizer/dataVisualizerTypes';
 import DisplayBufferService from './DisplayBufferService';
 
 /**
@@ -16,78 +15,11 @@ import DisplayBufferService from './DisplayBufferService';
  * Use this file especially when attempting to create a slang Context.
  */
 
-/**
- * Function that takes a value and displays it in the interpreter.
- * It uses the calc-slang stringify to convert values into a "nicer"
- * output. e.g. [1, 2, 3] displays as [1, 2, 3].
- * An action is dispatched using the redux store reference
- * within the global window object.
- *
- * @param value the value to be displayed
- * @param workspaceLocation used to determine
- *   which REPL the value shows up in.
- */
-function display(value: Value, str: string, workspaceLocation: any) {
-  display((str === undefined ? '' : str + ' ') + stringify(value), '', workspaceLocation);
-  return value;
-}
-
-/**
- * Function that takes a value and displays it in the interpreter.
- * The value is displayed however full JS would convert it to a string.
- * e.g. [1, 2, 3] would be displayed as 1,2,3.
- * An action is dispatched using the redux store reference
- * within the global window object.
- *
- * @param value the value to be displayed
- * @param workspaceLocation used to determine
- *   which REPL the value shows up in.
- */
-function rawDisplay(value: Value, str: string, workspaceLocation: any) {
-  const output = (str === undefined ? '' : str + ' ') + String(value);
-  DisplayBufferService.push(output, workspaceLocation);
-
-  return value;
-}
-
-/**
- * A function to prompt the user using a popup.
- * The function is not called 'prompt' to prevent shadowing.
- *
- * @param value the value to be displayed as a prompt
- */
-function cadetPrompt(value: any) {
-  return prompt(value);
-}
-
-/**
- * A function to alert the user using the browser's alert()
- * function.
- *
- * @param value the value to alert the user with
- */
-function cadetAlert(value: any) {
-  alert(stringify(value));
-}
-
-/**
- * A dummy function to pass into createContext.
- * An actual implementation will have to be added
- * with the data visualizer implementation. See #187
- *
- * @param args the data to be visualized.
- */
-function visualizeData(...args: Data[]) {
-  try {
-    // Pass in args[0] since args is in the form; [(Array of drawables), "playground"]
-    DataVisualizer.drawData(args[0]);
-
-    // If there is only one arg, just print out the first arg in REPL, instead of [first arg]
-    return args[0].length === 1 ? args[0][0] : args[0];
-  } catch (err) {
-    console.log(err);
-    throw new Error('Data visualizer is not enabled');
-  }
+function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {
+  args.forEach(x => {
+    const output = binaryToFormattedString(x.binary, x.type)
+    DisplayBufferService.push(output, workspaceLocation)
+  })
 }
 
 export function visualizeEnv({ context }: { context: Context }) {
@@ -115,15 +47,11 @@ export function highlightLine(line: number) {
 }
 
 export const externalBuiltIns = {
-  display,
-  rawDisplay,
-  prompt: cadetPrompt,
-  alert: cadetAlert,
-  visualiseList: visualizeData
+  printfLog
 };
 
 /**
- * A wrapper around calc-slang's createContext. This
+ * A wrapper around c-slang's createContext. This
  * provides the original function with the required
  * externalBuiltIns, such as display and prompt.
  */
@@ -132,7 +60,7 @@ export function createContext<T>(
   externalContext: T,
   variant: Variant = Variant.DEFAULT
 ) {
-  return createSlangContext<T>(variant, externals, externalContext);
+  return createSlangContext<T>(variant, externals, externalContext, externalBuiltIns);
 }
 
 
@@ -145,7 +73,7 @@ export function makeElevatedContext(context: Context) {
   // @ts-ignore
   const fakeFrame: { [key: string]: any } = new ProxyFrame();
   // Explanation: Proxy doesn't work for defineProperty in use-strict.
-  // The calc-slang will defineProperty on loadStandardLibraries
+  // The c-slang will defineProperty on loadStandardLibraries
   // Creating a raw JS object and setting prototype will allow defineProperty on the child
   // while reflection should work on parent.
 
