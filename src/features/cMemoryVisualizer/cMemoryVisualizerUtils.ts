@@ -92,7 +92,7 @@ export const populateRecordDetailMapWithStackPointer = (
 
     let currentScope = env[i].varScope;
     // Ignores the function scope and global scope
-    while (currentScope.parent?.parent?.parent) {
+    while (currentScope.parent?.parent) {
       if (map.memory[currentStackPointer] === undefined) map.memory[currentStackPointer] = [];
       map.memory[currentStackPointer].push({
         subtype: 'stack_pointer',
