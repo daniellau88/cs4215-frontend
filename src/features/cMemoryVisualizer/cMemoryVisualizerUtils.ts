@@ -106,13 +106,12 @@ export const populateRecordDetailMapWithStackPointer = (
   }
 
   // First pointer is always global
-  map.memory[0] = [
-    {
-      subtype: 'stack_pointer',
-      funcName: envFuncNames[0],
-      address: 0
-    }
-  ];
+  if (map.memory[currentStackPointer] === undefined) map.memory[currentStackPointer] = []
+  map.memory[currentStackPointer].push({
+    subtype: 'stack_pointer',
+    funcName: envFuncNames[0],
+    address: 0
+  });
 };
 
 export const setHoveredCursor = (target: Node | Group) => {
