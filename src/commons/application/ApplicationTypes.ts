@@ -109,10 +109,7 @@ export interface SALanguage extends Language {
   displayName: string;
 }
 
-const variantDisplay: Map<Variant, string> = new Map([
-  [Variant.DEFAULT, 'calc']
-]);
-
+const variantDisplay: Map<Variant, string> = new Map([[Variant.DEFAULT, 'calc']]);
 
 export const styliseSublanguage = (chapter: Chapter, variant: Variant = Variant.DEFAULT) => {
   return `Source \xa7${chapter}${
@@ -120,9 +117,7 @@ export const styliseSublanguage = (chapter: Chapter, variant: Variant = Variant.
   }`;
 };
 
-export const sublanguages: Language[] = [
-  { chapter: Chapter.CALC, variant: Variant.DEFAULT }
-];
+export const sublanguages: Language[] = [{ chapter: Chapter.CALC, variant: Variant.DEFAULT }];
 
 export const sourceLanguages: SALanguage[] = sublanguages.map(sublang => {
   return {
@@ -139,8 +134,7 @@ export const variantLanguages = sourceLanguages.filter(
   sublang => sublang.variant !== Variant.DEFAULT
 );
 
-export const isSourceLanguage = (chapter: Chapter) =>
-  [Chapter.CALC].includes(chapter);
+export const isSourceLanguage = (chapter: Chapter) => [Chapter.CALC].includes(chapter);
 
 const currentEnvironment = (): ApplicationEnvironment => {
   switch (process.env.NODE_ENV) {
@@ -179,7 +173,14 @@ export const defaultPlayground: PlaygroundState = {
   githubSaveInfo: { repoName: '', filePath: '' }
 };
 
-export const defaultEditorValue = '1+1';
+export const defaultEditorValue = `int main() {
+    char helloWorld[] = "Hello World!";
+    for (int i = 0; i < 12; i++) {
+        printfLog(helloWorld[i]);
+    }
+    return 0;
+}
+`;
 
 /**
  * Create a default IWorkspaceState for 'resetting' a workspace.
@@ -189,11 +190,7 @@ export const defaultEditorValue = '1+1';
  */
 export const createDefaultWorkspace = (workspaceLocation: WorkspaceLocation): WorkspaceState => ({
   autogradingResults: [],
-  context: createContext<WorkspaceLocation>(
-    [],
-    workspaceLocation,
-    Constants.defaultSourceVariant
-  ),
+  context: createContext<WorkspaceLocation>([], workspaceLocation, Constants.defaultSourceVariant),
   activeEditorTabIndex: 0,
   editorTabs: [
     {

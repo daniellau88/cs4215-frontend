@@ -1,9 +1,9 @@
 import { Chapter, Variant } from 'c-slang/dist/types';
 
-import { Links } from './Constants';
+import Constants, { Links } from './Constants';
 
 const MAIN_INTRODUCTION = `
-Welcome to the Source Academy playground!
+Welcome to the ${Constants.sourceAcademyDeploymentName} playground!
 `;
 
 const HOTKEYS_INTRODUCTION = `

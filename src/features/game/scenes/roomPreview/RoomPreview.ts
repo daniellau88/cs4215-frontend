@@ -187,7 +187,6 @@ export default class RoomPreview extends Phaser.Scene {
 
   private async eval(code: string) {
     // runInContext also automatically updates the context
-    console.log("code", code);
     await runInContext(code, this.context!);
   }
 

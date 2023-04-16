@@ -1,12 +1,10 @@
 /* tslint:disable: ban-types*/
 import createSlangContext from 'c-slang/dist/createContext';
 import { BinaryWithType } from 'c-slang/dist/interpreter/typings';
-import { binaryToFormattedString } from 'c-slang/dist/interpreter/utils/utils';
-import { Context, Variant } from 'c-slang/dist/types';
+import { Context, CustomBuiltIns, Variant } from 'c-slang/dist/types';
 import { difference, keys } from 'lodash';
+import CMemoryVisualizer from 'src/features/cMemoryVisualizer/cMemoryVisualizer';
 import EnvVisualizer from 'src/features/envVisualizer/EnvVisualizer';
-
-import DisplayBufferService from './DisplayBufferService';
 
 /**
  * This file contains wrappers for certain functions
@@ -15,11 +13,15 @@ import DisplayBufferService from './DisplayBufferService';
  * Use this file especially when attempting to create a slang Context.
  */
 
-function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {
-  args.forEach(x => {
-    const output = binaryToFormattedString(x.binary, x.type)
-    DisplayBufferService.push(output, workspaceLocation)
-  })
+function printfLog(workspaceLocation: any, args: Array<BinaryWithType>) {}
+
+export function visualizeCEnv({ context }: { context: Context }) {
+  try {
+    CMemoryVisualizer.drawEnv(context);
+  } catch (err) {
+    console.error(err);
+    throw new Error('C memory visualizer is not enabled');
+  }
 }
 
 export function visualizeEnv({ context }: { context: Context }) {
@@ -46,8 +48,8 @@ export function highlightLine(line: number) {
   }
 }
 
-export const externalBuiltIns = {
-  printfLog
+export const externalBuiltIns: CustomBuiltIns = {
+  printfLog: printfLog
 };
 
 /**
@@ -62,7 +64,6 @@ export function createContext<T>(
 ) {
   return createSlangContext<T>(variant, externals, externalContext, externalBuiltIns);
 }
-
 
 // Given a Context, returns a privileged Context that when referenced,
 // intercepts reads from the underlying Context and returns desired values

@@ -64,7 +64,6 @@ const Repl: React.FC<ReplProps> = (props: ReplProps) => {
 };
 
 export const Output: React.FC<OutputProps> = (props: OutputProps) => {
-  console.log("output", props.output)
   switch (props.output.type) {
     case 'code':
       return (

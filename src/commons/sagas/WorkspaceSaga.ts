@@ -1,11 +1,8 @@
-import {
-  Context,
-  interrupt,
-  runInContext
-} from 'c-slang';
+import { Context, interrupt, resume, runInContext } from 'c-slang';
 import { InterruptedError } from 'c-slang/dist/errors/errors';
+import { binaryToFormattedString, isMicrocode } from 'c-slang/dist/interpreter/utils/utils';
 import { parse } from 'c-slang/dist/parser/parser';
-import { Chapter, Variant } from 'c-slang/dist/types';
+import { Chapter, Result, Suspended, Variant } from 'c-slang/dist/types';
 import { random } from 'lodash';
 import Phaser from 'phaser';
 import { SagaIterator } from 'redux-saga';
@@ -39,6 +36,7 @@ import {
   highlightClean,
   highlightLine,
   makeElevatedContext,
+  visualizeCEnv,
   visualizeEnv
 } from '../utils/JsSlangHelper';
 import { showSuccessMessage, showWarningMessage } from '../utils/NotificationsHelper';
@@ -126,7 +124,7 @@ export default function* WorkspaceSaga(): SagaIterator {
     context = yield select((state: OverallState) => state.workspaces[workspaceLocation].context);
     yield put(actions.clearReplOutput(workspaceLocation));
     yield put(actions.highlightEditorLine([], workspaceLocation));
-    context.runtime.break = false;
+    context.programState.setRuntimeBreak(false);
     lastDebuggerResult = undefined;
   });
 
@@ -269,8 +267,8 @@ export default function* WorkspaceSaga(): SagaIterator {
         // TODO: Hardcoded to make use of the first editor tab. Rewrite after editor tabs are added.
         (state: OverallState) => state.workspaces[workspaceLocation].editorTabs[0].value
       );
+      console.log(code);
       context = yield select((state: OverallState) => state.workspaces[workspaceLocation].context);
-      console.log(code)
       // const result = findDeclaration(code, context, {
       //   line: action.payload.cursorPosition.row + 1,
       //   column: action.payload.cursorPosition.column
@@ -316,12 +314,18 @@ export default function* WorkspaceSaga(): SagaIterator {
   );
 }
 
-let lastDebuggerResult: any;
+let lastDebuggerResult: Result | undefined;
 function* updateInspector(workspaceLocation: WorkspaceLocation): SagaIterator {
   try {
-    const start = lastDebuggerResult.context.runtime.nodes[0].loc.start.line - 1;
-    const end = lastDebuggerResult.context.runtime.nodes[0].loc.end.line - 1;
+    if (lastDebuggerResult === undefined || lastDebuggerResult.status === 'error') return;
+    const nextInstruction = lastDebuggerResult.context.programState.peekA();
+    if (nextInstruction === undefined) return;
+    const node = isMicrocode(nextInstruction) ? nextInstruction.node : nextInstruction;
+    const start = node.loc.start.line - 1;
+    const end = node.loc.end.line - 1 + 1;
+
     yield put(actions.highlightEditorLine([start, end], workspaceLocation));
+    visualizeCEnv(lastDebuggerResult);
     visualizeEnv(lastDebuggerResult);
   } catch (e) {
     yield put(actions.highlightEditorLine([], workspaceLocation));
@@ -413,7 +417,7 @@ export function* evalEditor(
 
         const index: number = +b;
         context.errors = [];
-        exploded[index] = 'debugger;' + exploded[index];
+        exploded[index] = 'debugger();' + exploded[index];
         value = exploded.join('\n');
         if (isSourceLanguage(context.chapter)) {
           parse(value, context);
@@ -546,7 +550,9 @@ export function* evalCode(
 
   const { result, interrupted, paused } = yield race({
     result:
-      call(runInContext, code, context, {
+      actionType === DEBUG_RESUME && lastDebuggerResult
+        ? call(resume, lastDebuggerResult)
+        : call(runInContext, code, context, {
             scheduler: 'preemptive',
             executionMethod: 'interpreter',
             originalMaxExecTime: execTime,
@@ -562,6 +568,27 @@ export function* evalCode(
     interrupted: take(BEGIN_INTERRUPT_EXECUTION),
     paused: take(BEGIN_DEBUG_PAUSE)
   });
+
+  if (result) {
+    // Add console logs and warning outputs to frontend logs
+    const actualResult = result as Result;
+    if (actualResult.status === 'finished' || actualResult.status === 'suspended') {
+      const context = actualResult.context;
+      const logOutputs = context.programState.getLogOutput();
+      logOutputs.forEach(x => {
+        const output = binaryToFormattedString(x.binary, x.type);
+        DisplayBufferService.push(output, workspaceLocation);
+      });
+      const warningOutputs = context.programState.getWarningOutputs();
+      warningOutputs.forEach(x => {
+        DisplayBufferService.push(
+          `Warning: (Line ${x.node.loc.start.line}) ${x.message}`,
+          workspaceLocation
+        );
+      });
+    }
+  }
+
   if (interrupted) {
     interrupt(context);
     /* Redundancy, added ensure that interruption results in an error. */
@@ -601,8 +628,17 @@ export function* evalCode(
     yield put(actions.addEvent(events));
     return;
   } else if (result.status === 'suspended') {
+    const actualResult = result as Suspended;
+    const nextInstr = actualResult.context.programState.peekA();
+    const node = nextInstr && (isMicrocode(nextInstr) ? nextInstr.node : nextInstr);
     yield put(actions.endDebuggerPause(workspaceLocation));
-    yield put(actions.evalInterpreterSuccess('Breakpoint hit!', workspaceLocation));
+    yield* dumpDisplayBuffer(workspaceLocation);
+    yield put(
+      actions.evalInterpreterSuccess(
+        `Breakpoint hit${node ? ` at Line ${node.loc.start.line}!` : ''}`,
+        workspaceLocation
+      )
+    );
     return;
   }
   yield* dumpDisplayBuffer(workspaceLocation);

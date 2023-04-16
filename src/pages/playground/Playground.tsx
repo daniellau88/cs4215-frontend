@@ -20,6 +20,7 @@ import {
   setEditorSessionId,
   setSharedbConnected
 } from 'src/commons/collabEditing/CollabEditingActions';
+import SideContentCMemoryVisualizer from 'src/commons/sideContent/SideContentCMemoryVisualizer';
 import { useResponsive, useTypedSelector } from 'src/commons/utils/Hooks';
 import {
   browseReplHistoryDown,
@@ -455,9 +456,7 @@ const Playground: React.FC<PlaygroundProps> = ({ workspaceLocation = 'playground
 
   const tabs = React.useMemo(() => {
     const tabs: SideContentTab[] = [playgroundIntroductionTab];
-
-
-
+    tabs.push(cMemoryVisualizerTab);
     return tabs;
   }, [playgroundIntroductionTab]);
 
@@ -575,7 +574,6 @@ const Playground: React.FC<PlaygroundProps> = ({ workspaceLocation = 'playground
     handleEditorUpdateBreakpoints: handleEditorUpdateBreakpoints
   };
 
-  console.log("out", props.output)
   const replProps = {
     ..._.pick(props, 'output', 'replValue', 'handleReplEval', 'usingSubst'),
     handleBrowseHistoryDown: () => dispatch(browseReplHistoryDown(workspaceLocation)),
@@ -678,5 +676,11 @@ const mobileOnlyTabIds: readonly SideContentType[] = [
 ];
 const desktopOnlyTabIds: readonly SideContentType[] = [SideContentType.introduction];
 
+const cMemoryVisualizerTab: SideContentTab = {
+  label: 'C Memory Visualizer',
+  iconName: IconNames.CODE,
+  body: <SideContentCMemoryVisualizer />,
+  id: SideContentType.cMemoryVisualizer
+};
 
 export default Playground;

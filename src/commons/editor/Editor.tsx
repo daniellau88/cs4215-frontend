@@ -17,7 +17,7 @@ import { AceMouseEvent, HighlightedLines, Position } from './EditorTypes';
 // TODO: Should further refactor into EditorBase + different variants.
 // Ideally, hooks should be specified by the parent component instead.
 import useShareAce from './UseShareAce';
-import { getModeString, selectMode } from '../utils/AceHelper';
+import { selectMode } from '../utils/AceHelper';
 import { EditorBinding, WorkspaceSettingsContext } from '../WorkspaceSettingsContext';
 
 export type EditorKeyBindingHandlers = { [name in KeyFunction]?: () => void };
@@ -282,7 +282,7 @@ const EditorBase = React.memo((props: EditorProps & LocalStateProps) => {
     fontSize: 17,
     height: '100%',
     highlightActiveLine: false,
-    mode: getModeString(sourceChapter, sourceVariant, externalLibraryName),
+    mode: 'c_cpp',
     theme: 'source',
     value: props.editorValue,
     width: '100%',
