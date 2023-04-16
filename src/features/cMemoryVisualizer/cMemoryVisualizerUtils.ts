@@ -39,10 +39,12 @@ export const populateRecordDetailMapWithEnv = (
   map: RecordDetailsMap,
   env: DeepReadonly<Array<EScope>>
 ) => {
-  env.forEach(e => {
+  env.forEach((e, i) => {
     const name = e.name;
     let currentScope: DeepReadonly<VariableScope> | undefined = e.varScope;
     while (currentScope !== undefined) {
+      // Do not reexplore global environment
+      if (currentScope.parent === undefined && i !== 0) return;
       const records = currentScope.record;
       const keys = Object.keys(records);
       keys.forEach(key => {
